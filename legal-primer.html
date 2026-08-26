@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Legal primer: the checklist</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+<link rel="icon" href="assets/mascot.svg" type="image/svg+xml">
+</head>
+<body>
+
+<nav class="top">
+  <div class="bar">
+    <a class="logo" href="index.html"><img src="assets/wildcat-logo-white.svg" alt="Wildcat"><span>plaidcat</span></a>
+    <a class="item" href="index.html">Overview</a>
+    <a class="item" href="technical.html">Technical</a>
+    <a class="item" href="products.html">Products</a>
+    <a class="item" href="coverage.html">Coverage</a>
+    <a class="item" href="legal.html">Legal</a>
+    <a class="item" href="commercial.html">Commercial</a>
+    <a class="item" href="architecture.html">Architecture</a>
+    <a class="item" href="moat.html">Moat</a>
+    <span class="spacer"></span>
+    <span class="tag">Legal primer</span>
+  </div>
+</nav>
+
+<header class="page">
+  <div class="inner">
+    <span class="kicker">Primer · Legal &amp; compliance</span>
+    <h1>The checklist</h1>
+    <p class="lede">
+      Everything counsel needs to paper before the first borrower clicks
+      Connect, in workable order. The clause analysis and citations live on
+      the <a href="legal.html">data-rights page</a> and in research stream D.
+      This run is research, not legal advice; quoted clauses were captured
+      through search extraction and want re-verification against live pages.
+    </p>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <h2>1 · The Plaid order form</h2>
+  <ul>
+    <li>Written use-case approval that names, in words: retention of pulled
+    data, internal derivation of credit metrics, analytics access by
+    service providers, and distribution of derived, entity-level metrics to
+    lenders (and publicly, if that is ever wanted).</li>
+    <li>A customer-side derived-data and de-identified-data clause. Plaid's
+    standard paper grants that right to Plaid alone, in its sole discretion,
+    and grants the customer nothing symmetric. This is the negotiation's
+    center of gravity.</li>
+    <li>SLA or service credits; the standard MSA has neither.</li>
+    <li>Diary the mechanics: 60-day non-renewal notice, 30-day rate-change
+    notice at renewal, 10-day breach cure, 30-day post-termination download
+    window.</li>
+  </ul>
+
+  <h2>2 · The borrower consent artifact</h2>
+  <ul>
+    <li>Clear and conspicuous, per the MSA's Express Consent standard.
+    Names: the data categories pulled, the retention period or criteria,
+    the derivation of metrics, the recipient categories (analytics service
+    providers, auditors, lenders receiving derived metrics), and any
+    publication.</li>
+    <li>Signed by a person with authority to bind the entity and access the
+    accounts: an officer's certificate plus a rep and warranty that all
+    operating accounts are disclosed and the connecting login is the
+    account holder's.</li>
+    <li>Re-consent on material scope change. Revocation honored promptly;
+    deletion on request is contractual under Plaid's flow-downs whatever
+    statute says.</li>
+    <li>Loan-agreement companions: the re-link obligation with a cure
+    period, the monitorable-operating-account covenant, and the coverage
+    representation the anti-gaming tests check against.</li>
+  </ul>
+
+  <h2>3 · Intake screening rules</h2>
+  <ul>
+    <li>Entities only. No sole proprietorships, no personal accounts, no
+    personal guarantor cash-flow analytics. Any of those pulls the model
+    toward consumer reporting and GLBA territory; if lenders demand
+    guarantor analytics, route them through an existing consumer reporting
+    agency or accept CRA status as a deliberate decision.</li>
+    <li>Tokenize person-identifying strings (payroll lines, counterparty
+    names) at ingestion. It shrinks CCPA exposure for California
+    individuals and is the difference between manageable and miserable
+    under GDPR for any EU/UK borrower.</li>
+    <li>EU/UK borrowers get their own consent flow: controller obligations,
+    lawful-basis analysis for embedded employee data, purpose limitation
+    under open-banking rules, and no public per-borrower metrics.</li>
+  </ul>
+
+  <h2>4 · Papering the third parties</h2>
+  <ul>
+    <li>Analytics partners sign service-provider agreements: process only
+    for Wildcat, no independent use, deletion, security, Plaid restrictions
+    flowed down. Strike any vendor clause claiming ownership of data
+    derived from Wildcat's data; that grab is market-standard and
+    negotiable.</li>
+    <li>Lenders receiving anything recognizably Plaid-sourced sign
+    flow-down terms. Genuinely derived entity-level metrics argue lighter
+    treatment; read the paper broadly anyway.</li>
+    <li>Auditors go through Plaid's own rails (Audit Copy, Relay) where
+    possible, so consent and audit trails live inside Plaid.</li>
+  </ul>
+
+  <h2>5 · The watchlist</h2>
+  <div class="tablewrap">
+    <table>
+      <tr><th>Item</th><th>Why watch</th></tr>
+      <tr><td>CFPB 1033 reconsideration (at OIRA since Aug 2026)</td><td>Consumer-only either way, but its consent-hygiene architecture is the market template, and a fee-permissive rule entrenches bank-side charging.</td></tr>
+      <tr><td>New York Financial Data Rights Act (proposed)</td><td>Would cover small-business data with per-violation penalties: the first statute that would actually touch this model.</td></tr>
+      <tr><td>Bank data-access agreements</td><td>No statute obliges banks to serve business-account data; JPMorgan's paid regime is live and spreading. Supply continuity is the long-run threat.</td></tr>
+      <tr><td>Plaid's hidden cash-flow report product</td><td>If it ships, its terms may package exactly what Wildcat assembles by hand, with different data-rights language.</td></tr>
+      <tr><td>Item revocation asymmetries</td><td>Bank-side revocation may never signal; removal may leave stale bank-side grants. The borrower offboarding runbook should cover both ends.</td></tr>
+    </table>
+  </div>
+
+  <figure class="diagram">
+    <img src="assets/mascot/mascot-hologram.jpg" alt="Wildcat mascot as a hologram at a trading desk: legally complete, capable of precisely nothing" style="max-width:420px;width:100%;border-radius:10px;">
+    <figcaption>Kit reference art. The failure mode this checklist exists to
+    avoid.</figcaption>
+  </figure>
+
+  <div class="pager">
+    <a class="plain" href="engineering-primer.html"><div class="card link-card"><span class="dir">Back</span><h3>Engineering primer</h3></div></a>
+    <a class="plain" href="index.html"><div class="card link-card"><span class="dir">Next</span><h3>Overview</h3></div></a>
+  </div>
+
+</main>
+
+<footer class="site">
+  <div class="inner">
+    <img src="assets/wildcat-logo-white.svg" alt="Wildcat">
+    <span>Wildcat Labs · Shoggoth Fiat run · plaidcat</span>
+    <span class="spacer"></span>
+    <span>Let there be light.</span>
+  </div>
+</footer>
+
+</body>
+</html>

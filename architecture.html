@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Part IV · The Wildcat data layer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+<link rel="icon" href="assets/mascot.svg" type="image/svg+xml">
+</head>
+<body>
+
+<nav class="top">
+  <div class="bar">
+    <a class="logo" href="index.html"><img src="assets/wildcat-logo-white.svg" alt="Wildcat"><span>plaidcat</span></a>
+    <a class="item" href="index.html">Overview</a>
+    <a class="item" href="technical.html">Technical</a>
+    <a class="item" href="products.html">Products</a>
+    <a class="item" href="coverage.html">Coverage</a>
+    <a class="item" href="legal.html">Legal</a>
+    <a class="item" href="commercial.html">Commercial</a>
+    <a class="item active" href="architecture.html">Architecture</a>
+    <a class="item" href="moat.html">Moat</a>
+    <span class="spacer"></span>
+    <span class="tag">Part IV</span>
+  </div>
+</nav>
+
+<header class="page">
+  <div class="inner">
+    <span class="kicker">Part IV · Design</span>
+    <h1>The Wildcat data layer</h1>
+    <p class="lede">
+      Five layers from immutable capture to lender distribution, with the
+      metric formulas spelled out, the analytics access postures compared,
+      and the anti-gaming logic that decides whether any of it can be
+      trusted. Design synthesis from stream F: proposal, not sourced fact,
+      except where labeled.
+    </p>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <div class="toc">
+    <span class="label">On this page</span>
+    <ol>
+      <li><a href="#layers">The five layers</a></li>
+      <li><a href="#raw">Raw: the moat mechanism</a></li>
+      <li><a href="#normalized">Normalized: where the truth gets made</a></li>
+      <li><a href="#derived">Derived: the metric catalog</a></li>
+      <li><a href="#access">Analytics access postures</a></li>
+      <li><a href="#distribution">Lender distribution and hooks</a></li>
+      <li><a href="#antigaming">Anti-gaming</a></li>
+      <li><a href="#cost">Build cost and the buy line</a></li>
+      <li><a href="#runbook">Prototype runbook</a></li>
+    </ol>
+  </div>
+
+  <h2 id="layers">1 · The five layers</h2>
+
+  <figure class="diagram">
+    <svg viewBox="0 0 920 380" role="img" aria-label="Five layer architecture from raw capture to distribution">
+      <defs>
+        <marker id="arr5" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" fill="#30313E"/>
+        </marker>
+      </defs>
+      <g font-family="'Liberation Sans', Arial, sans-serif" font-size="13" fill="#141414">
+        <rect x="40" y="20" width="840" height="56" rx="10" fill="#1B1530" stroke="#4D26BC" stroke-width="1.5"/>
+        <text x="120" y="53" font-weight="bold" fill="#FFFFFF">RAW</text>
+        <text x="500" y="45" text-anchor="middle" font-size="11.5" fill="#BEBECE">every Plaid response verbatim, gzipped, object-locked · cursor journal · statement PDFs with hashes</text>
+        <text x="500" y="62" text-anchor="middle" font-size="11.5" fill="#BEBECE">KMS envelope encryption · vaulted access tokens · bitemporal: observed_at on everything</text>
+
+        <rect x="40" y="96" width="840" height="56" rx="10" fill="#FCFCFC" stroke="#141414" stroke-width="1.5"/>
+        <text x="120" y="129" font-weight="bold">NORMALIZED</text>
+        <text x="520" y="121" text-anchor="middle" font-size="11.5" fill="#8A8C9F">borrower · institution · item · account · transaction · counterparty · balance snapshots</text>
+        <text x="520" y="138" text-anchor="middle" font-size="11.5" fill="#8A8C9F">the class column (revenue / intercompany / sweep / financing) carries every metric above it</text>
+
+        <rect x="40" y="172" width="840" height="56" rx="10" fill="#FCFCFC" stroke="#141414" stroke-width="1.5"/>
+        <text x="120" y="205" font-weight="bold">DERIVED</text>
+        <text x="520" y="197" text-anchor="middle" font-size="11.5" fill="#8A8C9F">ten metrics per run, exact formulas below · reproducible from raw · code version + input manifest hash</text>
+        <text x="520" y="214" text-anchor="middle" font-size="11.5" fill="#8A8C9F">two bundles: revenue-centric for corporates, liquidity/flow-centric for trading firms</text>
+
+        <rect x="40" y="248" width="410" height="56" rx="10" fill="#FCFCFC" stroke="#3E68FF" stroke-width="1.5"/>
+        <text x="120" y="272" font-weight="bold">ACCESS</text>
+        <text x="245" y="290" text-anchor="middle" font-size="11.5" fill="#8A8C9F">scoped analyst postures: code-in, views, clean room</text>
+
+        <rect x="470" y="248" width="410" height="56" rx="10" fill="#FCFCFC" stroke="#3E68FF" stroke-width="1.5"/>
+        <text x="560" y="272" font-weight="bold">DISTRIBUTION</text>
+        <text x="690" y="290" text-anchor="middle" font-size="11.5" fill="#8A8C9F">signed JSON + PDF tear-sheets + EAS attestations</text>
+
+        <line x1="460" y1="76" x2="460" y2="90" stroke="#30313E" stroke-width="1.5" marker-end="url(#arr5)"/>
+        <line x1="460" y1="152" x2="460" y2="166" stroke="#30313E" stroke-width="1.5" marker-end="url(#arr5)"/>
+        <line x1="245" y1="228" x2="245" y2="242" stroke="#30313E" stroke-width="1.5" marker-end="url(#arr5)"/>
+        <line x1="690" y1="228" x2="690" y2="242" stroke="#30313E" stroke-width="1.5" marker-end="url(#arr5)"/>
+
+        <text x="460" y="334" text-anchor="middle" font-size="12" fill="#4D26BC">rules: raw is append-only · derived numbers reproduce from raw · lenders see derived only</text>
+        <text x="460" y="354" text-anchor="middle" font-size="12" fill="#4D26BC">everything leaving the boundary is signed · staleness is itself a published signal</text>
+      </g>
+    </svg>
+    <figcaption>The shape. Consent is a first-class object at every layer;
+    a borrower's revocation propagates down the stack.</figcaption>
+  </figure>
+
+  <h2 id="raw">2 · Raw: the moat mechanism</h2>
+
+  <p>
+    Every Plaid response lands verbatim in object storage, keyed by borrower,
+    Item, endpoint and date, with statement PDFs and their hashes alongside.
+    The cursor journal (cursor before and after, page, counts, pulled-at) is
+    the replayable source of truth. Plaid's history window caps at 730 days,
+    so the journal is what turns a two-year window into an ever-growing
+    archive: from month 25, this layer holds history no competitor can
+    re-pull with any consent. Object Lock keeps it append-only; access tokens
+    never enter the warehouse, they live vaulted and are referenced by opaque
+    ids; removed transactions are tombstoned, never deleted, so the system
+    can always reconstruct what it believed on any date. That last property
+    is what makes a disputed attestation defensible.
+  </p>
+
+  <h2 id="normalized">3 · Normalized: where the truth gets made</h2>
+
+  <p>
+    The canonical schema is ordinary: borrower, institution, item, account,
+    transaction, counterparty, balance snapshot, metric run, freshness. Three
+    decisions carry the weight:
+  </p>
+  <ul>
+    <li><strong>Fix the sign convention once.</strong> Plaid's positive means
+    outflow; store a normalized signed amount where positive means inflow and
+    never think about it again.</li>
+    <li><strong>The class column carries every metric above it.</strong> Every metric
+    depends on classifying each transaction: revenue, intercompany,
+    financing inflow, sweep, refund, opex, payroll, debt service, tax,
+    distribution, fee, NSF fee. Track the class source (rule, model, vendor,
+    manual) and audit every manual override.</li>
+    <li><strong>Counterparty resolution is borrower-scoped first.</strong>
+    Cross-borrower canonicalization comes later and is itself a platform
+    asset: the same "customer" paying three borrowers is visible only from
+    the platform seat.</li>
+  </ul>
+
+  <h2 id="derived">4 · Derived: the metric catalog</h2>
+
+  <p>
+    Computed per run over a window W, default the trailing 12 complete
+    months, on posted, non-pending, non-removed transactions in operating
+    accounts. Every bundle embeds its window, months used, coverage ratio and
+    staleness; a metric without freshness metadata is treated as stale.
+  </p>
+
+  <div class="tablewrap">
+    <table>
+      <tr><th>Metric</th><th>Definition</th><th>Edge case that decides its honesty</th></tr>
+      <tr><td>TTM inflows</td><td>Sum of revenue-classified inflows over the last 12 complete months</td><td>Report the gross figure and the exclusion delta too; a large delta between gross and revenue-classified inflows is itself a fraud signal</td></tr>
+      <tr><td>Average monthly operating cash flow</td><td>Mean of monthly net cash flow (revenue inflows minus operating outflows)</td><td>Months with coverage below 95% are excluded and disclosed</td></tr>
+      <tr><td>Minimum cash balance</td><td>Minimum of daily reconstructed total balance across W</td><td>Daily balances are reconstructed backward from snapshot anchors; multi-currency converts at a disclosed basis</td></tr>
+      <tr><td>Liquidity trend</td><td>Regression slope of month-end cash over 6 months, divided by average cash</td><td>Report with fit quality; a trend without fit is noise</td></tr>
+      <tr><td>Customer concentration</td><td>HHI over revenue-classified inflow shares by resolved counterparty</td><td>Publish the unresolved share alongside; an HHI over 40% unresolved inflows is meaningless</td></tr>
+      <tr><td>Recurring obligations</td><td>Monthly-equivalent sum of detected recurring outflow streams (same counterparty, stable amount, stable period, 3+ hits)</td><td>Classify debt service, rent, payroll, subscriptions separately</td></tr>
+      <tr><td>NSF / overdraft frequency</td><td>Count of NSF-fee transactions per 12 months, plus days with negative available balance</td><td>Category plus name-regex fallback; institutions differ in how fees surface</td></tr>
+      <tr><td>Cash-flow volatility</td><td>Coefficient of variation of monthly net cash flow; inflow volatility reported separately</td><td>Near-zero means flip the ratio to dollars and flag it</td></tr>
+      <tr><td>Operating-account coverage</td><td>Connected revenue-classified inflows divided by borrower-claimed revenue for the same period; target at least 0.85</td><td>The anti-gaming keystone; below target means the dataset measures a fraction of the business</td></tr>
+      <tr><td>Period and freshness</td><td>Window bounds, months used, per-item staleness hours, share of days with successful sync</td><td>Embedded in every bundle; staleness publishes as a signal, never hides</td></tr>
+    </table>
+  </div>
+
+  <div class="callout warn">
+    <span class="label">Classification edge cases that make or break every number</span>
+    <p>Intercompany transfers excluded by offsetting-pair detection and
+    declared affiliate lists, or TTM inflates arbitrarily. Sweep accounts
+    excluded from flows but included in balances. Credit-line draws classed
+    as financing, never revenue; an interest payment with no declared
+    facility is a red flag. Exchange transfers get their own class: for
+    trading firms, bank-rail "revenue" is meaningless, so ship a
+    liquidity-and-flow bundle instead of pretending. Refunds net against
+    revenue; tax flows class separately.</p>
+  </div>
+
+  <h2 id="access">5 · Analytics access postures</h2>
+
+  <div class="tablewrap">
+    <table>
+      <tr><th>Posture</th><th>How it works</th><th>When</th></tr>
+      <tr><td class="y">They send code, Wildcat runs it</td><td>Analysts submit versioned SQL or Python against the schema spec; Wildcat runs it, reviews outputs, releases only aggregates above disclosure thresholds and within the borrower's consent scope</td><td>Now, and at any n below ~20 borrowers. Cheap, auditable, right-sized</td></tr>
+      <tr><td class="m">Scoped warehouse views</td><td>Per-analyst accounts with row-level security from consent objects, column masking (no raw descriptors, anonymized counterparty ids), logged query gateway, egress caps</td><td>When analysts need iteration speed; beware that timing plus amounts fingerprint counterparties</td></tr>
+      <tr><td class="m">Clean room proper</td><td>AWS Clean Rooms or Snowflake DCR, aggregation-only rules, approved query templates, optional differential privacy</td><td>Only past ~30 borrowers; small-n aggregates deanonymize and noise destroys utility below that</td></tr>
+    </table>
+  </div>
+
+  <p class="small">
+    Cross-cutting whatever the posture: immutable query audit logs,
+    per-borrower consent scopes enforced in the view layer, and contractual
+    plus technical egress control. Analysts are papered as Permitted Service
+    Providers per the <a href="legal.html">legal page</a>.
+  </p>
+
+  <h2 id="distribution">6 · Lender distribution and hooks</h2>
+
+  <ul>
+    <li><strong>Signed JSON bundle</strong> per borrower per run: metrics,
+    window, coverage, staleness, code version, input manifest hash, issue
+    and expiry timestamps, signed by Wildcat's org key. The upgrade path is
+    a TEE-held key (AWS Nitro Enclaves has the mature attestation story in
+    2026; SGX is deprecated on client silicon) with the pinned metric code
+    published: trust Wildcat today, trust the enclave and the code tomorrow.
+    That is Credora's architecture with current parts.
+    <span class="badge official">official</span> on the TEE landscape.</li>
+    <li><strong>PDF tear-sheet</strong> rendering the same bundle, with the
+    JSON hash printed on it, for credit committees.</li>
+    <li><strong>EAS attestations onchain.</strong> The Ethereum Attestation
+    Service is production-proven at scale (Coinbase Verifications on Base).
+    Publish covenant-status tiers or booleans under a Wildcat schema,
+    revocable and expiring, and let V2 hooks consume them: Wildcat's docs
+    already contemplate access policies keyed on "a credential testifying to
+    off-chain circumstances." A market's capacity raise or APR change can
+    require a fresh, unrevoked health attestation. Staleness rules: expiry
+    at issue plus 35 days, degraded flags when coverage drops or an Item
+    stays broken past 7 days, and a lapsed attestation surfacing in the
+    lender UI as its own signal.
+    <span class="badge official">official</span> on EAS and hooks.</li>
+    <li><strong>Privacy gradient.</strong> Exact values, bucketed tiers,
+    threshold booleans, and eventually borrower-side zero-knowledge
+    threshold proofs. zkTLS is production-real in 2026 for point-in-time,
+    borrower-present threshold claims (3Jane runs Plaid plus Reclaim in
+    production); it is not yet the tool for bulk longitudinal metrics, which
+    is what the TEE path covers.
+    <span class="badge official">official</span></li>
+  </ul>
+
+  <h2 id="antigaming">7 · Anti-gaming</h2>
+
+  <div class="grid cols-2">
+    <div class="card"><h3>Round-tripping</h3><p class="small">Fake revenue
+    cycled through unconnected affiliates. Detect: inflow spikes from young
+    counterparties, in-out symmetry over days to weeks, revenue without the
+    expense texture real revenue drags along, amount distributions that are
+    too round.</p></div>
+    <div class="card"><h3>Hidden accounts</h3><p class="small">The structural
+    weakness of consent-based data: Plaid shows what is linked, not what
+    exists. Counter with the coverage test against claimed revenue, a rep
+    and warranty listing all accounts, and the smoking gun: transfers to
+    unlinked self-owned accounts visible in the connected ones.</p></div>
+    <div class="card"><h3>Window dressing</h3><p class="small">Borrowed cash
+    parked over month-end. Counter with daily reconstructed balances, the
+    financing-inflow class, and a hot-money residency flag for balance
+    spikes that live under a week.</p></div>
+    <div class="card"><h3>Item sabotage</h3><p class="small">Links that break
+    before bad weeks. Staleness is a published signal, outages correlated
+    with volatility get flagged, and re-linking is a contractual obligation
+    with cure periods, not a favor.</p></div>
+  </div>
+
+  <div class="callout risk">
+    <span class="label">Honest limit</span>
+    <p>Bank data cannot see exchange balances, prime-broker margin, or
+    offchain derivatives. Those are the exact holes that killed Maple's book
+    in 2022: Orthogonal's hidden FTX exposure was invisible to any bank
+    feed, and Credora's ratings missed Alameda for the same reason. For
+    crypto-native borrowers the bank layer must pair with exchange read-API
+    or custodian attestations, or it monitors the wrong pocket. Say this
+    plainly in lender-facing docs.</p>
+  </div>
+
+  <h2 id="cost">8 · Build cost and the buy line</h2>
+
+  <ul>
+    <li><strong>Team and time.</strong> A credible v1 (ingestion, archive,
+    warehouse, metric engine, consent console, tear-sheets, EAS publishing,
+    code-in analytics posture) is 4 to 6 people for 6 to 9 months, roughly
+    25 to 40 engineer-months. The TEE upgrade adds 2 to 3 months of one
+    infra engineer. <span class="badge inferred">estimate</span></li>
+    <li><strong>Infra.</strong> The data is small (50 borrowers is low
+    millions of rows): $2k to $6k a month. Plaid fees dominate infra and are
+    themselves small; see <a href="commercial.html">commercials</a>.</li>
+    <li><strong>The real ongoing cost is Item babysitting.</strong> No public
+    breakage benchmark exists; operator lore says 2 to 5% of Items hit
+    login-required per month, better on OAuth majors. Budget a quarter to
+    half an FTE for re-link campaigns, classification-rule upkeep, and
+    monthly metric review. <span class="badge unverified">unverified lore</span></li>
+    <li><strong>Buy the commodity middle, own the differentiated edges.</strong>
+    Classification and enrichment are purchasable (Heron Data, Ntropy,
+    Ocrolus for statement OCR) and their training data beats a cold start;
+    but they are tuned to US SMB patterns and cannot classify trading-firm
+    flows, which is conveniently the differentiated part. Own the raw
+    archive, the metric definitions, the signing layer, and the anti-gaming
+    logic. Never let a vendor hold the only copy of raw data, and strike
+    vendor clauses claiming ownership of derivatives of Wildcat's data.</li>
+  </ul>
+
+  <h2 id="runbook">9 · Prototype runbook</h2>
+
+  <p>A two-week spike that retires the biggest unknowns with one real borrower:</p>
+  <ol>
+    <li>Plaid Trial plan (ten free live Items). Sandbox first, then one
+    consenting friendly borrower.</li>
+    <li>Link flow with <code>transactions</code> product,
+    <code>days_requested: 730</code>, raw descriptors on,
+    <code>additional_consented_products: ["assets"]</code>... note Assets
+    actually requires Link-time initialization, so put it in the products
+    array from the start.</li>
+    <li>Ingestion service: exchange, store tokens vaulted, first
+    <code>/transactions/sync</code>, webhook receiver with JWT verification,
+    cursor journal to append-only storage.</li>
+    <li>Measure what the research could not: actual history depth returned by
+    the borrower's institutions, business-account indicator population,
+    counterparty confidence on B2B flows, statement availability.</li>
+    <li>Classify one quarter by hand with the class taxonomy; compute the ten
+    metrics; check the coverage test against the borrower's claimed
+    revenue.</li>
+    <li>Render one tear-sheet and one signed JSON bundle; publish one EAS
+    attestation on a testnet; wire a toy hook that reads it.</li>
+    <li>Write down every institution-specific surprise; that list is the
+    real deliverable.</li>
+  </ol>
+
+  <figure class="diagram">
+    <img src="assets/mascot/mascot-sketch.jpg" alt="Wildcat mascot sketched at a drawing desk" style="max-width:440px;width:100%;border-radius:10px;">
+    <figcaption>Kit reference art. Design first, ink later.</figcaption>
+  </figure>
+
+  <div class="sources">
+    <h3>Sources</h3>
+    <p>Design synthesis and its sourced inputs live in
+    <a href="research/research-F-architecture.md">research stream F</a>:
+    Credora and RedStone coverage, 3Jane verification, zkTLS and TEE
+    landscape citations, EAS production evidence, clean-room documentation,
+    vendor documentation for Heron, Ntropy and Ocrolus, and Wildcat's own
+    docs for the hooks system.</p>
+  </div>
+
+  <div class="pager">
+    <a class="plain" href="commercial.html"><div class="card link-card"><span class="dir">Back</span><h3>Commercials</h3></div></a>
+    <a class="plain" href="moat.html"><div class="card link-card"><span class="dir">Next</span><h3>The moat verdict</h3></div></a>
+  </div>
+
+</main>
+
+<footer class="site">
+  <div class="inner">
+    <img src="assets/wildcat-logo-white.svg" alt="Wildcat">
+    <span>Wildcat Labs · Shoggoth Fiat run · plaidcat</span>
+    <span class="spacer"></span>
+    <span>Let there be light.</span>
+  </div>
+</footer>
+
+</body>
+</html>

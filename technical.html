@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Part I · The pipe: from Connect to data</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+<link rel="icon" href="assets/mascot.svg" type="image/svg+xml">
+</head>
+<body>
+
+<nav class="top">
+  <div class="bar">
+    <a class="logo" href="index.html"><img src="assets/wildcat-logo-white.svg" alt="Wildcat"><span>plaidcat</span></a>
+    <a class="item" href="index.html">Overview</a>
+    <a class="item active" href="technical.html">Technical</a>
+    <a class="item" href="products.html">Products</a>
+    <a class="item" href="coverage.html">Coverage</a>
+    <a class="item" href="legal.html">Legal</a>
+    <a class="item" href="commercial.html">Commercial</a>
+    <a class="item" href="architecture.html">Architecture</a>
+    <a class="item" href="moat.html">Moat</a>
+    <span class="spacer"></span>
+    <span class="tag">Part I</span>
+  </div>
+</nav>
+
+<header class="page">
+  <div class="inner">
+    <span class="kicker">Part I · Technical workflow</span>
+    <h1>The pipe: from "Connect Operating Accounts" to data</h1>
+    <p class="lede">
+      What actually happens between a borrower clicking a button and
+      transactions landing in Wildcat's backend. Every actor, every token,
+      every webhook, and every way the connection dies. Verified against
+      Plaid's published OpenAPI specification (2026-08-17 build).
+    </p>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <div class="toc">
+    <span class="label">On this page</span>
+    <ol>
+      <li><a href="#flow">The connect flow, actor by actor</a></li>
+      <li><a href="#items">Items and access tokens</a></li>
+      <li><a href="#consent">Consent, scoping, expiration</a></li>
+      <li><a href="#revocation">Revocation from three sides</a></li>
+      <li><a href="#webhooks">Webhooks</a></li>
+      <li><a href="#freshness">Is the connection live?</a></li>
+      <li><a href="#production">Production requirements</a></li>
+      <li><a href="#questions">The brief's questions, answered</a></li>
+    </ol>
+  </div>
+
+  <h2 id="flow">1 · The connect flow, actor by actor</h2>
+
+  <figure class="diagram">
+    <svg viewBox="0 0 920 210" role="img" aria-label="API sequence from link token creation to webhooks">
+      <defs>
+        <marker id="arr2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" fill="#30313E"/>
+        </marker>
+      </defs>
+      <g font-family="'Liberation Sans', Arial, sans-serif" font-size="12.5" fill="#141414">
+        <rect x="15" y="70" width="128" height="46" rx="9" fill="#FCFCFC" stroke="#141414" stroke-width="1.5"/>
+        <text x="79" y="90" text-anchor="middle" font-weight="bold">/link/token/create</text>
+        <text x="79" y="106" text-anchor="middle" font-size="10.5" fill="#8A8C9F">backend, 4h TTL</text>
+
+        <rect x="173" y="70" width="108" height="46" rx="9" fill="#FCFCFC" stroke="#141414" stroke-width="1.5"/>
+        <text x="227" y="90" text-anchor="middle" font-weight="bold">Plaid Link</text>
+        <text x="227" y="106" text-anchor="middle" font-size="10.5" fill="#8A8C9F">consent pane</text>
+
+        <rect x="311" y="70" width="128" height="46" rx="9" fill="#FCFCFC" stroke="#3E68FF" stroke-width="1.5"/>
+        <text x="375" y="90" text-anchor="middle" font-weight="bold">Bank OAuth</text>
+        <text x="375" y="106" text-anchor="middle" font-size="10.5" fill="#8A8C9F">creds never touch Plaid</text>
+
+        <rect x="469" y="70" width="118" height="46" rx="9" fill="#FCFCFC" stroke="#141414" stroke-width="1.5"/>
+        <text x="528" y="90" text-anchor="middle" font-weight="bold">public_token</text>
+        <text x="528" y="106" text-anchor="middle" font-size="10.5" fill="#8A8C9F">ephemeral, 30 min</text>
+
+        <rect x="617" y="70" width="128" height="46" rx="9" fill="#1B1530" stroke="#4D26BC" stroke-width="1.5"/>
+        <text x="681" y="90" text-anchor="middle" font-weight="bold" fill="#FFFFFF">access_token</text>
+        <text x="681" y="106" text-anchor="middle" font-size="10.5" fill="#BEBECE">never expires</text>
+
+        <rect x="775" y="70" width="128" height="46" rx="9" fill="#FCFCFC" stroke="#141414" stroke-width="1.5"/>
+        <text x="839" y="90" text-anchor="middle" font-weight="bold">Product APIs</text>
+        <text x="839" y="106" text-anchor="middle" font-size="10.5" fill="#8A8C9F">sync, assets, identity</text>
+
+        <line x1="143" y1="93" x2="165" y2="93" stroke="#30313E" stroke-width="1.5" marker-end="url(#arr2)"/>
+        <line x1="281" y1="93" x2="303" y2="93" stroke="#30313E" stroke-width="1.5" marker-end="url(#arr2)"/>
+        <line x1="439" y1="93" x2="461" y2="93" stroke="#30313E" stroke-width="1.5" marker-end="url(#arr2)"/>
+        <line x1="587" y1="93" x2="609" y2="93" stroke="#30313E" stroke-width="1.5" marker-end="url(#arr2)"/>
+        <line x1="745" y1="93" x2="767" y2="93" stroke="#30313E" stroke-width="1.5" marker-end="url(#arr2)"/>
+
+        <text x="528" y="40" text-anchor="middle" font-size="11" fill="#4D26BC">/item/public_token/exchange, server-side only</text>
+        <line x1="528" y1="46" x2="528" y2="62" stroke="#4D26BC" stroke-width="1" marker-end="url(#arr2)"/>
+        <text x="839" y="150" text-anchor="middle" font-size="11" fill="#4D26BC">webhooks announce every update</text>
+        <line x1="839" y1="124" x2="839" y2="138" stroke="#4D26BC" stroke-width="1"/>
+      </g>
+    </svg>
+    <figcaption>The token relay. Only the public_token crosses the browser;
+    the access_token is minted and held server-side and does not expire.</figcaption>
+  </figure>
+
+  <p>
+    The full production trace, sixteen steps, with what each actor does.
+    B is the borrower, F the Wildcat frontend, S the Wildcat backend, P is
+    Plaid, K the bank. Source: stream A, verified against the OpenAPI spec.
+    <span class="badge official">official</span>
+  </p>
+
+  <div class="tablewrap">
+    <table>
+      <tr><th>#</th><th>Actor</th><th>What happens</th></tr>
+      <tr><td>1</td><td>B → F</td><td>Clicks "Connect Operating Accounts."</td></tr>
+      <tr><td>2</td><td>F → S</td><td>Authenticated request for a link token.</td></tr>
+      <tr><td>3</td><td>S → P</td><td><code>/link/token/create</code> with <code>products: ["transactions"]</code>, <code>transactions.days_requested: 730</code>, <code>additional_consented_products</code> for later products, a webhook URL, account filters for business checking and savings, and an internal borrower id. The 730 is a one-shot: it cannot be raised later without deleting and re-linking the Item.</td></tr>
+      <tr><td>4</td><td>P → F</td><td>Returns a <code>link_token</code>, valid four hours.</td></tr>
+      <tr><td>5</td><td>F</td><td>Opens Plaid Link with it.</td></tr>
+      <tr><td>6</td><td>B in Link</td><td>Sees the consent pane: Wildcat's name, Plaid's role and privacy policy, and under Data Transparency Messaging the exact data types and use cases requested. Accepts, then picks the institution.</td></tr>
+      <tr><td>7</td><td>B at K</td><td>OAuth path (the US majors): redirected to the bank's own site or app, logs in there, picks which accounts to share on the bank's screen, approves. Credentials never touch Plaid. Legacy path (long tail): enters bank credentials inside Link, answers MFA there.</td></tr>
+      <tr><td>8</td><td>B in Link</td><td>Confirms account selection unless the bank's picker already settled it. Link shows Connected.</td></tr>
+      <tr><td>9</td><td>F</td><td><code>onSuccess</code> fires with a <code>public_token</code> and metadata. Sends the token to the backend. It expires in 30 minutes.</td></tr>
+      <tr><td>10</td><td>S → P</td><td><code>/item/public_token/exchange</code> returns the <code>access_token</code> and <code>item_id</code>. Both are encrypted and stored server-side, never sent back to the browser.</td></tr>
+      <tr><td>11</td><td>P → K</td><td>Plaid begins pulling: the most recent 30 days first, then the historical backfill toward the 730-day request.</td></tr>
+      <tr><td>12</td><td>S → P</td><td>First <code>/transactions/sync</code> call with an empty cursor. This also arms the sync webhook; skipping it is a common integration bug.</td></tr>
+      <tr><td>13</td><td>P → S</td><td><code>SYNC_UPDATES_AVAILABLE</code> webhook, first with <code>initial_update_complete</code>, later with <code>historical_update_complete</code>. The backend verifies the ES256 JWT on every delivery before trusting it.</td></tr>
+      <tr><td>14</td><td>S → P</td><td>On each webhook, loops <code>/transactions/sync</code> with the stored cursor until <code>has_more</code> is false. Upserts added and modified rows, tombstones removed ones, saves the cursor atomically. Data has landed.</td></tr>
+      <tr><td>15</td><td>steady state</td><td>Plaid re-polls the bank one to four times a day. Each change fires the webhook and step 14 repeats. Before a credit decision, an on-demand <code>/transactions/refresh</code> (paid add-on) forces a fresh pull.</td></tr>
+      <tr><td>16</td><td>exceptions</td><td><code>ITEM_LOGIN_REQUIRED</code> or a pending-disconnect warning sends the borrower through update mode; same tokens continue afterward. Revocation webhooks halt use. Offboarding calls <code>/item/products/terminate</code>, which also stops billing.</td></tr>
+    </table>
+  </div>
+
+  <h2 id="items">2 · Items and access tokens</h2>
+
+  <div class="grid cols-2">
+    <div class="card">
+      <h3>What an Item is</h3>
+      <p class="small">One authenticated connection to one institution login,
+      created through Link. It groups one or more accounts and carries the
+      product set, the user's consent scope, the webhook URL, health state,
+      and billing. Linking the same credentials twice makes two independent
+      Items, except at Chase, which silently de-duplicates.
+      <span class="badge official">official</span></p>
+    </div>
+    <div class="card">
+      <h3>What the access token is</h3>
+      <p class="small">The long-lived credential the backend pairs with
+      Wildcat's client id and secret to read that Item. Plaid's docs say it
+      plainly: "An access_token does not expire." It dies only by explicit
+      removal, rotation, or revocation. A leaked token alone is useless
+      without the API secret, but treat it as a bank-data credential: server
+      side only, encrypted at rest, never in logs.
+      <span class="badge official">official</span></p>
+    </div>
+  </div>
+
+  <figure class="diagram">
+    <svg viewBox="0 0 920 260" role="img" aria-label="Item lifecycle state machine">
+      <defs>
+        <marker id="arr3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" fill="#30313E"/>
+        </marker>
+      </defs>
+      <g font-family="'Liberation Sans', Arial, sans-serif" font-size="13" fill="#141414">
+        <rect x="60" y="90" width="180" height="60" rx="12" fill="#EAF8EF" stroke="#157A47" stroke-width="1.5"/>
+        <text x="150" y="116" text-anchor="middle" font-weight="bold">HEALTHY</text>
+        <text x="150" y="134" text-anchor="middle" font-size="10.5" fill="#157A47">1-4 pulls/day, webhooks flowing</text>
+
+        <rect x="380" y="90" width="200" height="60" rx="12" fill="#FBF4DC" stroke="#8A6B10" stroke-width="1.5"/>
+        <text x="480" y="112" text-anchor="middle" font-weight="bold">ITEM_LOGIN_REQUIRED</text>
+        <text x="480" y="130" text-anchor="middle" font-size="10.5" fill="#8A6B10">password change, MFA reset,</text>
+        <text x="480" y="142" text-anchor="middle" font-size="10.5" fill="#8A6B10">consent lapse, bank revocation</text>
+
+        <rect x="700" y="90" width="170" height="60" rx="12" fill="#FDF0F0" stroke="#C24647" stroke-width="1.5"/>
+        <text x="785" y="116" text-anchor="middle" font-weight="bold">DEAD</text>
+        <text x="785" y="134" text-anchor="middle" font-size="10.5" fill="#C24647">/item/remove or revoked</text>
+
+        <line x1="240" y1="105" x2="372" y2="105" stroke="#30313E" stroke-width="1.5" marker-end="url(#arr3)"/>
+        <text x="306" y="96" text-anchor="middle" font-size="10.5" fill="#8A8C9F">ERROR webhook</text>
+        <path d="M380,135 C330,175 290,175 248,140" fill="none" stroke="#30313E" stroke-width="1.5" marker-end="url(#arr3)"/>
+        <text x="312" y="182" text-anchor="middle" font-size="10.5" fill="#157A47">update mode: same token, same history</text>
+        <line x1="580" y1="120" x2="692" y2="120" stroke="#30313E" stroke-width="1.5" marker-end="url(#arr3)"/>
+        <text x="636" y="111" text-anchor="middle" font-size="10.5" fill="#8A8C9F">not repaired, or revoked</text>
+        <path d="M150,90 C300,20 600,20 770,88" fill="none" stroke="#C24647" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#arr3)"/>
+        <text x="460" y="34" text-anchor="middle" font-size="10.5" fill="#C24647">borrower revokes at my.plaid.com or the bank, or Wildcat offboards</text>
+        <text x="150" y="230" font-size="10.5" fill="#8A6B10">PENDING_DISCONNECT / PENDING_EXPIRATION give 7 days' warning before scheduled breaks</text>
+      </g>
+    </svg>
+    <figcaption>The Item lifecycle. Re-authentication is cheap: update mode
+    reuses the same access_token and item_id, so history continuity is
+    preserved. A dead Item keeps billing until removed, so offboarding
+    hygiene is a billing control too.</figcaption>
+  </figure>
+
+  <h2 id="consent">3 · Consent, scoping, expiration</h2>
+
+  <p>
+    Consent is scoped on two axes, both fixed at link time. Products and data
+    scopes come from the four product arrays on
+    <code>/link/token/create</code> and surface to the borrower in the
+    consent pane; accounts come from Account Select or the bank's own OAuth
+    picker. Broadening either requires a fresh consent session. Products can
+    never be removed from an Item, only the whole Item can go.
+    <span class="badge official">official</span>
+  </p>
+  <ul>
+    <li><strong>The clever array.</strong> <code>additional_consented_products</code>
+    banks consent now and bills nothing until the endpoint is first called.
+    An underwriting flow that starts transactions-first can add Auth or
+    Liabilities later without another Link session.</li>
+    <li><strong>Consent visibility shipped ahead of regulation.</strong>
+    <code>/item/get</code> exposes consented products, use cases and data
+    scopes; <code>/consent/events/get</code> holds a three-year consent log.
+    Wildcat gets an audit trail for free.</li>
+    <li><strong>Expiration reality, August 2026.</strong> There is no
+    universal US consent expiration. The often-repeated "90-day rule" is a
+    UK/EU artifact. Specific US institutions impose roughly 12-month windows
+    through their data-access agreements: Bank of America, PNC, and Capital
+    One are confirmed examples. Plaid's machinery for a 12-month
+    reauthorization regime is built and explicitly dormant, waiting on the
+    1033 rulemaking. <span class="badge official">official</span></li>
+  </ul>
+
+  <h2 id="revocation">4 · Revocation from three sides</h2>
+
+  <div class="tablewrap">
+    <table>
+      <tr><th>Who</th><th>How</th><th>Effect</th><th>Signal to Wildcat</th></tr>
+      <tr>
+        <td>Wildcat</td>
+        <td><code>/item/remove</code> or the newer <code>/item/products/terminate</code></td>
+        <td>Access token and derived processor tokens die immediately; subscription billing ends. Existing Asset Reports survive.</td>
+        <td class="y">Deterministic, it made the call</td>
+      </tr>
+      <tr>
+        <td>Borrower via Plaid Portal (my.plaid.com)</td>
+        <td>Revoke the app, revoke Plaid, or request deletion from Plaid's systems</td>
+        <td>Access stops, billing ends. Data already delivered to Wildcat stays with Wildcat, subject to the contractual deletion duty on request.</td>
+        <td class="y"><code>USER_PERMISSION_REVOKED</code> webhook</td>
+      </tr>
+      <tr>
+        <td>Borrower at the bank</td>
+        <td>The bank's own OAuth permission manager</td>
+        <td>Item breaks.</td>
+        <td class="m">Unreliable: <code>USER_ACCOUNT_REVOKED</code> fires only for Chase, PNC and Truist; elsewhere nothing until the next pull fails with <code>ITEM_LOGIN_REQUIRED</code></td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="callout warn">
+    <span class="label">Asymmetry worth knowing</span>
+    <p>Neither side's off-switch cleans the other's UI. Removing an Item can
+    leave a stale "active" entry in the bank's OAuth manager, and bank-side
+    revocation may never ping Plaid. Wildcat's borrower offboarding runbook
+    should tell borrowers to revoke at both my.plaid.com and their bank, and
+    Wildcat should treat webhook silence as no proof of consent.
+    <span class="badge official">official</span></p>
+  </div>
+
+  <h2 id="webhooks">5 · Webhooks</h2>
+
+  <p>
+    Webhooks are at-least-once "go fetch" signals, not payloads of record.
+    Delivery retries for 24 hours with four-fold backoff from 30 seconds and
+    a 10-second response timeout. Every delivery carries a
+    <code>Plaid-Verification</code> header holding an ES256 JWT; verify it
+    against <code>/webhook_verification_key/get</code> and compare the body
+    hash before trusting anything. <span class="badge official">official</span>
+  </p>
+
+  <div class="grid cols-2">
+    <div class="card">
+      <h3>Data webhooks (TRANSACTIONS)</h3>
+      <p class="small">
+        <code>SYNC_UPDATES_AVAILABLE</code> is the one that matters: it fires
+        on the initial pull, the historical backfill, and every scheduled
+        update, and only after the first <code>/transactions/sync</code> call
+        arms it. <code>RECURRING_TRANSACTIONS_UPDATE</code> covers recurring
+        streams. <code>INITIAL_UPDATE</code>, <code>HISTORICAL_UPDATE</code>,
+        <code>DEFAULT_UPDATE</code> and <code>TRANSACTIONS_REMOVED</code> are
+        legacy, kept for back-compatibility.
+      </p>
+    </div>
+    <div class="card">
+      <h3>Lifecycle webhooks (ITEM)</h3>
+      <p class="small">
+        <code>ERROR</code> carries <code>ITEM_LOGIN_REQUIRED</code>.
+        <code>PENDING_DISCONNECT</code> (US/CA) and
+        <code>PENDING_EXPIRATION</code> (EU/UK) warn 7 days ahead.
+        <code>USER_PERMISSION_REVOKED</code> and
+        <code>USER_ACCOUNT_REVOKED</code> signal revocation.
+        <code>NEW_ACCOUNTS_AVAILABLE</code> says the borrower opened an
+        account worth adding. <code>LOGIN_REPAIRED</code> says the Item healed
+        without Wildcat's help.
+      </p>
+    </div>
+  </div>
+
+  <h2 id="freshness">6 · Is the connection live?</h2>
+
+  <p>
+    Persistent, yes. Live, no. Plaid polls each institution on its own
+    schedule, typically one to four times a day, and callers mostly read
+    Plaid's cache. There is no real-time feed. On-demand freshness before a
+    credit decision comes from <code>/transactions/refresh</code>, a paid,
+    access-gated add-on that pulls synchronously in roughly ten to thirty
+    seconds. Balance has the same split: <code>/accounts/get</code> is free
+    and cached, <code>/accounts/balance/get</code> forces a real-time pull
+    and bills per call. <span class="badge official">official</span>
+  </p>
+
+  <h2 id="production">7 · Production requirements</h2>
+
+  <ul>
+    <li>Two environments: Sandbox and Production. The free tier is now the
+    Trial plan, ten live Items, which replaced Limited Production for new
+    US/CA teams on 15 April 2026. <span class="badge official">official</span></li>
+    <li>Full production: dashboard application, use-case review by Plaid's
+    Customer Oversight team, billing setup, and about a week of processing.
+    OAuth registration then runs per institution; Schwab can add six weeks,
+    and PNC gates on the security questionnaire.
+    <span class="badge official">official</span></li>
+    <li>The security questionnaire is effectively SOC 2-shaped: encryption at
+    rest and in transit, access reviews, MFA, penetration tests, background
+    checks, incident response. A team without those controls will struggle.
+    <span class="badge reported">operator-reported</span></li>
+  </ul>
+
+  <h2 id="questions">8 · The brief's questions, answered</h2>
+
+  <div class="grid cols-2">
+    <div class="card"><h3>Can permissions be scoped?</h3><p class="small">Yes, at link time, on the product axis and the account axis. Broadening needs a new consent session. Narrowing means removing the Item.</p></div>
+    <div class="card"><h3>Can access be revoked?</h3><p class="small">By all three parties: Wildcat by API call, the borrower through Plaid Portal or their bank, the bank by killing the OAuth grant. Revocation stops future access only; delivered data stays delivered.</p></div>
+    <div class="card"><h3>How long does the credential survive?</h3><p class="small">Indefinitely by design. Nothing about the token needs refreshing. What decays is bank-side consent at specific institutions, and credentials when borrowers change passwords.</p></div>
+    <div class="card"><h3>What happens on credential expiry?</h3><p class="small">The Item enters <code>ITEM_LOGIN_REQUIRED</code>, a webhook says so, and update mode fixes it with the same token and unbroken history. Warnings arrive 7 days early where the break is scheduled.</p></div>
+    <div class="card"><h3>Can Wildcat terminate?</h3><p class="small">Yes, and it must for billing hygiene: errored Items keep billing until removed. <code>/item/products/terminate</code> is the recommended offboarding call.</p></div>
+    <div class="card"><h3>Does the connection stay live?</h3><p class="small">It persists until someone kills it, refreshed one to four times a day, with a paid on-demand refresh for decision moments. Real-time it is not.</p></div>
+  </div>
+
+  <div class="sources">
+    <h3>Sources</h3>
+    <p>Full per-claim citations live in
+    <a href="research/research-A-technical.md">research stream A</a>. Primary:
+    Plaid OpenAPI specification 2020-09-14_1.729.1 (github.com/plaid/plaid-openapi,
+    2026-08-17), plaid.com/docs pages for Link, Items, OAuth, update mode,
+    webhooks, transactions, errors, and the launch checklist; support.plaid.com
+    for Trial-plan and consent articles.</p>
+  </div>
+
+  <div class="pager">
+    <a class="plain" href="index.html"><div class="card link-card"><span class="dir">Back</span><h3>Overview</h3></div></a>
+    <a class="plain" href="products.html"><div class="card link-card"><span class="dir">Next</span><h3>Part II · The data</h3></div></a>
+  </div>
+
+</main>
+
+<footer class="site">
+  <div class="inner">
+    <img src="assets/wildcat-logo-white.svg" alt="Wildcat">
+    <span>Wildcat Labs · Shoggoth Fiat run · plaidcat</span>
+    <span class="spacer"></span>
+    <span>Let there be light.</span>
+  </div>
+</footer>
+
+</body>
+</html>

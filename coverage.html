@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Part III · Business accounts: where the money hides</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+<link rel="icon" href="assets/mascot.svg" type="image/svg+xml">
+</head>
+<body>
+
+<nav class="top">
+  <div class="bar">
+    <a class="logo" href="index.html"><img src="assets/wildcat-logo-white.svg" alt="Wildcat"><span>plaidcat</span></a>
+    <a class="item" href="index.html">Overview</a>
+    <a class="item" href="technical.html">Technical</a>
+    <a class="item" href="products.html">Products</a>
+    <a class="item active" href="coverage.html">Coverage</a>
+    <a class="item" href="legal.html">Legal</a>
+    <a class="item" href="commercial.html">Commercial</a>
+    <a class="item" href="architecture.html">Architecture</a>
+    <a class="item" href="moat.html">Moat</a>
+    <span class="spacer"></span>
+    <span class="tag">Part III</span>
+  </div>
+</nav>
+
+<header class="page">
+  <div class="inner">
+    <span class="kicker">Part III · Commercial coverage</span>
+    <h1>Business accounts: where the money hides</h1>
+    <p class="lede">
+      Consumer aggregation does not translate to corporate treasury. This is
+      the highest-risk assumption in the whole design, so it gets the
+      bluntest page: what connects, what never will, and what to do about it.
+    </p>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <div class="toc">
+    <span class="label">On this page</span>
+    <ol>
+      <li><a href="#front-door">The two front doors</a></li>
+      <li><a href="#institutions">Institution reality</a></li>
+      <li><a href="#failures">Failure modes</a></li>
+      <li><a href="#archetypes">Coverage by borrower archetype</a></li>
+      <li><a href="#alternatives">Alternatives and complements</a></li>
+      <li><a href="#risks">The three risks and their mitigations</a></li>
+    </ol>
+  </div>
+
+  <h2 id="front-door">1 · The two front doors</h2>
+
+  <p>
+    Plaid's business support is real and officially marketed: Transactions
+    for Business (May 2025) claims 95% of US banks that serve small
+    businesses, with business accounts connectable at 4,500-plus
+    institutions. <span class="badge official">official</span> The catch is
+    which door that covers. Plaid reaches the <strong>online-banking front
+    door</strong>: chase.com business profiles, Bank of America small
+    business, wellsfargo.com business, and the fintech banks. It does not
+    reach the <strong>treasury back door</strong>: JPMorgan Access and Chase
+    Connect, CashPro, Wells Fargo Vantage, CitiDirect, SinglePoint, PINACLE.
+    Those are separate authentication realms with no Plaid institution
+    entries, and no other aggregator reaches them either.
+    <span class="badge reported">operator-reported</span>
+  </p>
+
+  <figure class="diagram">
+    <svg viewBox="0 0 920 300" role="img" aria-label="SMB online banking connects to aggregators; treasury portals do not">
+      <g font-family="'Liberation Sans', Arial, sans-serif" font-size="13" fill="#141414">
+        <rect x="40" y="40" width="380" height="220" rx="14" fill="#EAF8EF" stroke="#157A47" stroke-width="1.5"/>
+        <text x="230" y="70" text-anchor="middle" font-weight="bold" font-size="15">SMB online banking</text>
+        <text x="230" y="92" text-anchor="middle" font-size="11" fill="#157A47">Plaid, Finicity, MX, Akoya can see this</text>
+        <text x="230" y="125" text-anchor="middle" font-size="12">Chase Business Complete · BofA small business</text>
+        <text x="230" y="145" text-anchor="middle" font-size="12">Wells business online · US Bank · PNC (via Akoya)</text>
+        <text x="230" y="165" text-anchor="middle" font-size="12">Mercury · Brex · Relay · Bluevine · SVB</text>
+        <text x="230" y="185" text-anchor="middle" font-size="12">Cross River business · regionals · CUs</text>
+        <text x="230" y="225" text-anchor="middle" font-size="11" fill="#157A47">OAuth handles even hardware-token MFA</text>
+
+        <rect x="500" y="40" width="380" height="220" rx="14" fill="#FDF0F0" stroke="#C24647" stroke-width="1.5"/>
+        <text x="690" y="70" text-anchor="middle" font-weight="bold" font-size="15">Treasury portals</text>
+        <text x="690" y="92" text-anchor="middle" font-size="11" fill="#C24647">invisible to every aggregator</text>
+        <text x="690" y="125" text-anchor="middle" font-size="12">JPM Access / Chase Connect · BofA CashPro</text>
+        <text x="690" y="145" text-anchor="middle" font-size="12">WF Vantage (ex-CEO) · CitiDirect</text>
+        <text x="690" y="165" text-anchor="middle" font-size="12">US Bank SinglePoint · PNC PINACLE</text>
+        <text x="690" y="185" text-anchor="middle" font-size="12">crypto fiat rails: BCB, Clear Junction, FBO accounts</text>
+        <text x="690" y="225" text-anchor="middle" font-size="11" fill="#C24647">reachable only by direct bank APIs, ERP connectors, BAI2 feeds</text>
+      </g>
+    </svg>
+    <figcaption>The wall. The bigger the borrower, the more of its cash sits
+    on the right-hand side.</figcaption>
+  </figure>
+
+  <h2 id="institutions">2 · Institution reality</h2>
+
+  <div class="tablewrap">
+    <table>
+      <tr><th>Institution</th><th>Plaid?</th><th>Notes</th></tr>
+      <tr><td>Chase (business profiles on chase.com)</td><td class="y">Yes</td><td>OAuth; account selection; "business accounts may have limited support" per trackers; JPMC-Plaid data agreement now paid. <span class="badge official">official</span></td></tr>
+      <tr><td>Bank of America small business</td><td class="y">Yes</td><td>OAuth, but only the primary account holder's username can link; sub-users see no eligible accounts. Items expire after 12 months. <span class="badge official">official</span></td></tr>
+      <tr><td>Wells Fargo business online</td><td class="y">Yes</td><td>OAuth via WF Data Exchange. <span class="badge official">official</span></td></tr>
+      <tr><td>CitiBusiness Online</td><td class="m">Flaky</td><td>Separate institution entry, chronically broken in operator reports; Finicity historically steadier here. <span class="badge reported">operator-reported</span></td></tr>
+      <tr><td>PNC business online</td><td class="y">Yes</td><td>Since the Sep 2024 agreement, riding Akoya's API; 12-month consent windows. <span class="badge official">official</span></td></tr>
+      <tr><td>US Bank business online</td><td class="y">Yes</td><td>OAuth institution; SinglePoint treasury is not covered. <span class="badge official">official</span></td></tr>
+      <tr><td>Mercury / Brex / Relay / Bluevine</td><td class="y">Yes</td><td>First-class Plaid institutions. Brex is now Capital One-owned (closed Apr 2026); expect estate migration over time. <span class="badge official">official</span></td></tr>
+      <tr><td>SVB (First Citizens)</td><td class="y">Yes</td><td>Formal Plaid partnership. <span class="badge official">official</span></td></tr>
+      <tr><td>Cross River Bank</td><td class="y">Yes</td><td>Two separate institutions: Personal, and Branch Banking Business. <span class="badge official">official</span></td></tr>
+      <tr><td>Treasury portals (all)</td><td class="n">No</td><td>No aggregator path found anywhere. <span class="badge inferred">inferred</span></td></tr>
+      <tr><td>Crypto fiat rails (BCB Group, Clear Junction, Customers CBIT, Lead Bank FBO)</td><td class="n">No</td><td>Own client APIs or FBO structures; assume unlinkable, plan borrower-provisioned feeds. <span class="badge inferred">inferred</span></td></tr>
+      <tr><td>UK/EU SME accounts (Tide, Revolut Business, Wise, CMA9)</td><td class="y">Yes</td><td>In open-banking scope via Plaid's licensed AISP entities; corporate host-to-host is out. <span class="badge official">official</span></td></tr>
+    </table>
+  </div>
+
+  <p class="small">
+    Connectivity is necessary, not sufficient. Check
+    <code>/institutions/get</code>'s per-institution products array and the
+    per-product health status at Link time; an unsupported call returns
+    <code>PRODUCTS_NOT_SUPPORTED</code>. Rule of thumb for business accounts:
+    Balance and Transactions almost everywhere an institution connects,
+    Assets wherever Transactions works, Identity noisy, Statements at about
+    ten large banks. <span class="badge official">official</span>
+  </p>
+
+  <h2 id="failures">3 · Failure modes</h2>
+
+  <div class="grid cols-2">
+    <div class="card"><h3>Wrong front door</h3><p class="small">The company
+    banks at JPM or BofA commercial, so the institution is literally absent
+    from Link's search. Nothing to debug; the account is out of scope.</p></div>
+    <div class="card"><h3>Entitlement lockout</h3><p class="small">The CFO or
+    bookkeeper connects fine to the bank and sees zero linkable accounts,
+    because only the primary owner's login can share business accounts. The
+    treasury team almost never holds that credential. Onboarding must name
+    the right human.</p></div>
+    <div class="card"><h3>Separate-institution confusion</h3><p class="small">
+    Citibank against CitiBusiness Online, Cross River Personal against
+    Business. The borrower picks the wrong entry and the login fails or the
+    wrong accounts appear.</p></div>
+    <div class="card"><h3>Consent decay and login churn</h3><p class="small">
+    12-month consent windows at BofA, PNC and Capital One; password resets
+    and security interstitials elsewhere. Items die on schedule and by
+    accident; a dead Item during a drawdown is a monitoring outage. Watch the
+    warning webhooks and drive re-auth 30 days early.</p></div>
+    <div class="card"><h3>Partial account selection</h3><p class="small">OAuth
+    pickers let the borrower share a subset and hide the rest. Reconcile the
+    shared account count against the borrower's declared accounts, or the
+    dataset silently measures a fraction of the business.</p></div>
+    <div class="card"><h3>Scraping sunset</h3><p class="small">The majors are
+    all API-based now and the long-tail portals that never got APIs simply
+    rot. What SMB lenders actually run: Plaid or Finicity for banking,
+    accounting-platform data alongside, manual document upload as the
+    universal floor. <span class="badge reported">operator-reported</span></p></div>
+  </div>
+
+  <h2 id="archetypes">4 · Coverage by borrower archetype</h2>
+
+  <div class="tablewrap">
+    <table>
+      <tr><th>Archetype</th><th>Typical banks</th><th>Usable coverage</th><th>Read</th></tr>
+      <tr><td>Crypto-native trading firm</td><td>Mercury, Brex, Cross River, SVB, plus BCB and Clear Junction for fiat rails</td><td class="m">60-80% of accounts, often under 50% of flows</td><td>Fintech accounts link well; the rails accounts that carry the real volume do not. Bank data alone monitors the wrong pocket; pair with exchange and custodian attestations.</td></tr>
+      <tr><td>Fintech startup (US)</td><td>Mercury or Brex plus a Chase or BofA business account</td><td class="y">80-95%</td><td>The sweet spot, minus sub-user lockouts.</td></tr>
+      <tr><td>Mid-market corporate</td><td>JPM Access, CashPro, Vantage, PINACLE, SinglePoint</td><td class="n">10-40%</td><td>Operating cash lives in treasury portals. Needs direct bank APIs, file feeds, or statement upload.</td></tr>
+      <tr><td>UK/EU borrower</td><td>CMA9 business accounts, Tide, Revolut Business, Wise</td><td class="m">50-80%</td><td>Open banking covers SME accounts; corporate host-to-host is out; 90-day consent reconfirmation is app-side maintenance.</td></tr>
+    </table>
+  </div>
+
+  <figure class="diagram">
+    <img src="assets/mascot/mascot-meowton-bank.jpg" alt="Wildcat mascot as a bank teller at Meowton Community Bank" style="max-width:440px;width:100%;border-radius:10px;">
+    <figcaption>Kit reference art: not every bank is Meowton Community Bank,
+    however much we wish it were.</figcaption>
+  </figure>
+
+  <h2 id="alternatives">5 · Alternatives and complements</h2>
+
+  <ul>
+    <li><strong>Finicity (Mastercard).</strong> The long-tail business
+    fallback; historically steadier on odd business portals, lists
+    CitiBusiness Online as a distinct connection.
+    <span class="badge reported">operator-reported</span></li>
+    <li><strong>MX, Akoya, Teller.</strong> MX for regional depth (also
+    cannot reach WF commercial); Akoya is the bank-owned pipe now under
+    PNC-to-Plaid traffic; Teller is developer-friendly with a smaller
+    institution set.</li>
+    <li><strong>Codat and accounting data.</strong> For corporate borrowers,
+    accounting-platform data (QuickBooks, Xero, NetSuite) may be the better
+    primitive than bank rails; Codat's edge is exactly that. Complement, not
+    replacement.</li>
+    <li><strong>Direct treasury APIs and file feeds.</strong> CashPro API,
+    JPM Access API, CitiConnect, or borrower-configured BAI2 / ISO 20022 /
+    SFTP feeds. They reach exactly what aggregators cannot, at the cost of
+    borrower-driven paperwork with their bank. For large cooperative
+    borrowers this is a real path, not a fantasy.</li>
+  </ul>
+
+  <h2 id="risks">6 · The three risks and their mitigations</h2>
+
+  <div class="callout risk">
+    <span class="label">Risk 1 · The treasury-portal wall</span>
+    <p>The bigger the borrower, the less any aggregator sees; the borrowers
+    with the largest credit lines have the least visible cash. Mitigate
+    three ways: make borrower-provisioned direct bank feeds a first-class
+    integration path; contractually require a monitorable operating account
+    that reference flows transit; accept auditor-style monthly statement
+    upload with tamper checks as the covenant-grade floor.</p>
+  </div>
+  <div class="callout risk">
+    <span class="label">Risk 2 · Entitlement and consent decay</span>
+    <p>Links that never form (sub-user lockouts, partial account selection)
+    and links that silently die (12-month windows, password churn). Mitigate
+    with an onboarding runbook that puts the credential owner through Link
+    and verifies shared-account count against declared accounts; monitor
+    consent expiry and drive update-mode re-auth 30 days early; write
+    re-linking obligations with cure periods into the loan agreement.</p>
+  </div>
+  <div class="callout risk">
+    <span class="label">Risk 3 · Single-aggregator dependence</span>
+    <p>Product gaps, per-institution health volatility, and the new
+    pay-for-data regime all concentrate in one vendor. Mitigate with
+    multi-aggregator routing on a pre-flight check of the products array and
+    health status; gate features per institution instead of assuming uniform
+    capability; keep the manual statement pipeline alive so no borrower is
+    unsupportable.</p>
+  </div>
+
+  <div class="sources">
+    <h3>Sources</h3>
+    <p>Full per-claim citations and confidence labels live in
+    <a href="research/research-C-business-coverage.md">research stream C</a>.
+    Primary: Plaid institution pages and help-center articles, the
+    Transactions-for-Business launch, bank and processor documentation,
+    QuickBooks and Acumatica operator threads, press coverage of the 2024-25
+    bank data agreements.</p>
+  </div>
+
+  <div class="pager">
+    <a class="plain" href="products.html"><div class="card link-card"><span class="dir">Back</span><h3>Part II · The data</h3></div></a>
+    <a class="plain" href="legal.html"><div class="card link-card"><span class="dir">Next</span><h3>Data rights &amp; law</h3></div></a>
+  </div>
+
+</main>
+
+<footer class="site">
+  <div class="inner">
+    <img src="assets/wildcat-logo-white.svg" alt="Wildcat">
+    <span>Wildcat Labs · Shoggoth Fiat run · plaidcat</span>
+    <span class="spacer"></span>
+    <span>Let there be light.</span>
+  </div>
+</footer>
+
+</body>
+</html>

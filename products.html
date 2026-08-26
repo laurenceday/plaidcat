@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Part II · The data: what Wildcat can actually obtain</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+<link rel="icon" href="assets/mascot.svg" type="image/svg+xml">
+</head>
+<body>
+
+<nav class="top">
+  <div class="bar">
+    <a class="logo" href="index.html"><img src="assets/wildcat-logo-white.svg" alt="Wildcat"><span>plaidcat</span></a>
+    <a class="item" href="index.html">Overview</a>
+    <a class="item" href="technical.html">Technical</a>
+    <a class="item active" href="products.html">Products</a>
+    <a class="item" href="coverage.html">Coverage</a>
+    <a class="item" href="legal.html">Legal</a>
+    <a class="item" href="commercial.html">Commercial</a>
+    <a class="item" href="architecture.html">Architecture</a>
+    <a class="item" href="moat.html">Moat</a>
+    <span class="spacer"></span>
+    <span class="tag">Part II</span>
+  </div>
+</nav>
+
+<header class="page">
+  <div class="inner">
+    <span class="kicker">Part II · Data products</span>
+    <h1>The data: what Wildcat can actually obtain</h1>
+    <p class="lede">
+      Transactions, Assets and Statements do different jobs, bill
+      differently, and share differently. Which of them carries a persistent
+      borrower cash-flow dataset, and what the fine print does to the
+      two-year-history ambition.
+    </p>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <div class="toc">
+    <span class="label">On this page</span>
+    <ol>
+      <li><a href="#transactions">Transactions, the workhorse</a></li>
+      <li><a href="#assets">Assets, the artifact</a></li>
+      <li><a href="#statements">Statements, the fallback</a></li>
+      <li><a href="#others">The rest of the catalog</a></li>
+      <li><a href="#comparison">Side by side</a></li>
+      <li><a href="#verdict">Foundation verdict</a></li>
+    </ol>
+  </div>
+
+  <h2 id="transactions">1 · Transactions, the workhorse</h2>
+
+  <p>
+    The one product built for a persistent, continuously updated dataset.
+    Everything below is verified against the OpenAPI spec unless labeled
+    otherwise. <span class="badge official">official</span>
+  </p>
+
+  <ul>
+    <li><strong>Lookback.</strong> <code>days_requested</code> runs 1 to 730,
+    default 90, set once at Link and immutable afterward. Getting this wrong
+    means deleting the Item and asking the borrower to re-link. The 730 is a
+    request ceiling, not a promise: Capital One serves 90 days, Bank of
+    America 18 months on checking. Real two-year depth accrues by holding the
+    connection and letting the dataset age in.</li>
+    <li><strong>Fields.</strong> Amounts (positive means outflow, a
+    sign-convention trap), posted and authorized dates, merchant name,
+    counterparties with stable entity ids and confidence levels, the
+    personal-finance category taxonomy, location, payment channel, pending
+    lifecycle, and the raw bank descriptor when
+    <code>include_original_description</code> is switched on. Switch it on:
+    B2B wires and ACH descriptors mostly resolve as low-confidence cleansed
+    strings, and the raw string is what a classifier needs.</li>
+    <li><strong>Sync.</strong> <code>/transactions/sync</code> returns added,
+    modified and removed arrays with a cursor. Plaid polls institutions one
+    to four times a day; <code>SYNC_UPDATES_AVAILABLE</code> announces every
+    change; <code>/transactions/refresh</code> forces a pull for a fee.</li>
+    <li><strong>Recurring.</strong> <code>/transactions/recurring</code>
+    detects inflow and outflow streams with predicted next dates and
+    frequencies; ask for at least 180 days of history for it to work well.</li>
+    <li><strong>Business betas.</strong> "Transactions for Business" (May
+    2025) added a business-account indicator (about 70% populated) and 13
+    business categories: Revenue, Payroll, Loan Payments and the rest. Both
+    are gated through an account manager. The spec also hides a
+    <code>business_finance_category</code> on every transaction.
+    <span class="badge reported">operator-reported</span></li>
+  </ul>
+
+  <div class="callout note">
+    <span class="label">Found in the spec</span>
+    <p>An entire undocumented <code>/cashflow_report/*</code> endpoint family
+    (get, refresh, transactions, insights, 730-day range) sits hidden in
+    Plaid's current OpenAPI build. It reads as an unreleased packaged
+    cash-flow report, plausibly the business-side counterpart to the consumer
+    Check product. If it ships, it could collapse some of the
+    assemble-it-yourself work this site describes. Existence verified in the
+    spec; everything else about it is
+    <span class="badge unverified">unverified</span>.</p>
+  </div>
+
+  <h2 id="assets">2 · Assets, the artifact</h2>
+
+  <ul>
+    <li>An Asset Report is an immutable point-in-time snapshot over 1 to 99
+    Items and up to 731 days: balances, daily historical balances, the full
+    transaction window, and account-owner identity. Generation is
+    asynchronous, announced by webhook, and the report renders to a
+    bank-formatted PDF. <span class="badge official">official</span></li>
+    <li>Assets must be in the products array at Link; it cannot be added to
+    an existing Item later. Refreshing means buying a new report. History
+    past 61 days adds a flat fee, and each block of five Items in one report
+    multiplies the report fee.</li>
+    <li><strong>Sharing is the point.</strong> Audit Copy hands a fixed
+    auditor (Fannie Mae, Freddie Mac, Ocrolus) direct access. Relay shares
+    the exact report, JSON and PDF and even refresh rights, with any third
+    party that holds its own Plaid client id. These are the sanctioned rails
+    for handing verified reports to downstream parties, and the recipient
+    must be Plaid-registered. <span class="badge official">official</span></li>
+    <li>Fit: origination and covenant checkpoints. As a monitoring feed it is
+    the wrong shape and the wrong bill.</li>
+  </ul>
+
+  <h2 id="statements">3 · Statements, the fallback</h2>
+
+  <p>
+    The product is the PDFs: exact bank-branded statements with SHA-256
+    hashes, listed and downloaded by API, up to two years requested in one
+    Link session and extendable forward by refresh.
+    <span class="badge official">official</span>
+  </p>
+
+  <div class="callout risk">
+    <span class="label">The brief asked directly</span>
+    <p><strong>Could Wildcat pull about two years of corporate
+    operating-account statements automatically after one connect?</strong>
+    Only partially. Mechanically yes at a supported institution: one Link
+    session with a 24-month window returns the PDFs, and monthly refreshes
+    extend forward. The limits: coverage is roughly ten large banks plus
+    assorted small ones, around 40% of US depository accounts, with Chase
+    still gated behind early availability; depository accounts only; Plaid's
+    own docs instruct integrators to build a fallback; per-institution
+    statement depth varies; and whether business operating accounts work
+    reliably per institution is <span class="badge unverified">unverified</span>.
+    Fintech business banks (Mercury, Relay and kin) generally lack Statements
+    support entirely.</p>
+  </div>
+
+  <h2 id="others">4 · The rest of the catalog</h2>
+
+  <div class="grid cols-2">
+    <div class="card"><h3>Balance</h3><p class="small">Cached balances free on
+    <code>/accounts/get</code>; real-time pulls on
+    <code>/accounts/balance/get</code> billed per call. Spot checks before
+    disbursement, nothing more. Balance Plus appears folded into Signal; its
+    risk schemas left the spec. <span class="badge unverified">unverified</span></p></div>
+    <div class="card"><h3>Identity</h3><p class="small">Account-holder names,
+    emails, phones, addresses; only names are guaranteed. Business-account
+    detection is officially unsupported here, and whether the name returned
+    is the entity or the signer depends on the institution. Plan for
+    reconciliation, not truth. <span class="badge official">official</span></p></div>
+    <div class="card"><h3>Signal</h3><p class="small">Per-payment ACH return
+    risk with 80-plus attributes. Repayment-collection tooling, not
+    monitoring. Requires its own consent since July 2026.</p></div>
+    <div class="card"><h3>Income / Bank Income</h3><p class="small">Models a
+    person's income, not a company's revenue. Plaid now steers new US
+    integrations toward Consumer Report. Not a foundation here.</p></div>
+    <div class="card"><h3>Plaid Check / Consumer Report</h3><p class="small">
+    Plaid's own FCRA consumer reporting agency: cash-flow attributes,
+    LendScore, 24-hour report TTL, monitoring subscriptions. Consumer only.
+    For business-entity credit it is inapplicable; using it on guarantors
+    drags in FCRA duties. See the <a href="legal.html">legal page</a>.</p></div>
+    <div class="card"><h3>Enrich &amp; processor tokens</h3><p class="small">
+    <code>/transactions/enrich</code> runs Plaid's categorization over
+    transactions obtained elsewhere, useful for statement-parsed or
+    direct-feed data. Processor tokens expose nearly the full product surface
+    to a Plaid partner per Item, but there is no processor Assets; report
+    sharing goes through Relay.</p></div>
+  </div>
+
+  <h2 id="comparison">5 · Side by side</h2>
+
+  <div class="tablewrap">
+    <table>
+      <tr><th></th><th>Transactions</th><th>Assets</th><th>Statements</th></tr>
+      <tr><td>Max lookback</td><td>730 days requested at init, institution caps apply</td><td>731 days per report</td><td>Up to 2 years of PDFs</td></tr>
+      <tr><td>Shape</td><td>Live rows with enrichment</td><td>Immutable dated snapshot + PDF</td><td>Bank-branded PDFs, no parsed fields</td></tr>
+      <tr><td>Freshness</td><td class="y">1-4 auto-pulls/day + webhooks</td><td class="n">Frozen at generation</td><td class="m">Monthly cadence</td></tr>
+      <tr><td>Refresh</td><td>Cursor deltas; paid on-demand refresh</td><td>New billed report each time</td><td>Per-statement refresh fee</td></tr>
+      <tr><td>Third-party sharing</td><td>Processor tokens</td><td class="y">Relay + Audit Copy</td><td class="n">None; redistribute files yourself</td></tr>
+      <tr><td>Billing</td><td>Subscription per Item/month</td><td>Per report, multipliers apply</td><td>Per statement volume</td></tr>
+      <tr><td>Continuous monitoring</td><td class="y">Best fit</td><td class="n">Poor</td><td class="m">Weak</td></tr>
+      <tr><td>Point-in-time underwriting</td><td class="m">Good, but no fixed artifact</td><td class="y">Best fit, GSE-accepted</td><td class="m">Strong evidence, weak coverage</td></tr>
+      <tr><td>Business-account fit</td><td class="y">95% of SMB banks claimed; betas gated</td><td class="y">Wherever linkable</td><td class="n">~40% coverage, business support unverified</td></tr>
+    </table>
+  </div>
+
+  <h2 id="verdict">6 · Foundation verdict</h2>
+
+  <div class="callout verdict">
+    <span class="label">What carries the dataset</span>
+    <p><strong>Transactions is the foundation; Assets is the underwriting
+    artifact; Statements is documentary evidence where it exists.</strong>
+    Initialize every Item with <code>days_requested: 730</code>, raw
+    descriptors on, and the business betas requested. Generate Asset Reports
+    at origination and covenant checkpoints for an immutable, shareable,
+    PDF-able record. Pull Statements where supported as bank-authenticated
+    proof. Check, Income and Signal are explicitly not foundations for a
+    business-entity data layer. Institution history caps mean the two-year
+    dataset is partly harvested and partly grown: connect early, keep the
+    Item alive, and month 25 onward becomes history nobody else can re-pull.</p>
+  </div>
+
+  <figure class="diagram">
+    <img src="assets/mascot/mascot-cure-period.jpg" alt="Wildcat mascot reviewing papers at a banker's desk" style="max-width:520px;width:100%;border-radius:10px;">
+    <figcaption>Kit reference art. Regeneration prompts for every art slot
+    live in <a href="assets/imagegen-prompts.md">the imagegen catalog</a>.</figcaption>
+  </figure>
+
+  <div class="sources">
+    <h3>Sources</h3>
+    <p>Full per-claim citations live in
+    <a href="research/research-B-products.md">research stream B</a>. Primary:
+    Plaid OpenAPI specification (2026-08-17 build) for endpoint and field
+    text; plaid.com/docs for Transactions, Assets, Statements, Identity,
+    Signal, Income, Check and billing; the Transactions-for-Business launch
+    post for the SMB betas.</p>
+  </div>
+
+  <div class="pager">
+    <a class="plain" href="technical.html"><div class="card link-card"><span class="dir">Back</span><h3>Part I · The pipe</h3></div></a>
+    <a class="plain" href="coverage.html"><div class="card link-card"><span class="dir">Next</span><h3>Part III · Business accounts</h3></div></a>
+  </div>
+
+</main>
+
+<footer class="site">
+  <div class="inner">
+    <img src="assets/wildcat-logo-white.svg" alt="Wildcat">
+    <span>Wildcat Labs · Shoggoth Fiat run · plaidcat</span>
+    <span class="spacer"></span>
+    <span>Let there be light.</span>
+  </div>
+</footer>
+
+</body>
+</html>

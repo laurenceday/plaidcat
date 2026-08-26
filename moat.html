@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The moat verdict</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+<link rel="icon" href="assets/mascot.svg" type="image/svg+xml">
+</head>
+<body>
+
+<nav class="top">
+  <div class="bar">
+    <a class="logo" href="index.html"><img src="assets/wildcat-logo-white.svg" alt="Wildcat"><span>plaidcat</span></a>
+    <a class="item" href="index.html">Overview</a>
+    <a class="item" href="technical.html">Technical</a>
+    <a class="item" href="products.html">Products</a>
+    <a class="item" href="coverage.html">Coverage</a>
+    <a class="item" href="legal.html">Legal</a>
+    <a class="item" href="commercial.html">Commercial</a>
+    <a class="item" href="architecture.html">Architecture</a>
+    <a class="item active" href="moat.html">Moat</a>
+    <span class="spacer"></span>
+    <span class="tag">Verdict</span>
+  </div>
+</nav>
+
+<header class="page">
+  <div class="inner">
+    <span class="kicker">Defensibility</span>
+    <h1>The moat verdict</h1>
+    <p class="lede">
+      Does holding the borrower dataset create a defensible advantage, or do
+      Plaid's contracts, portability, and borrower rights hollow it out?
+      The graveyard of credit protocols answers most of it; the rest is
+      structural.
+    </p>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <div class="toc">
+    <span class="label">On this page</span>
+    <ol>
+      <li><a href="#graveyard">What the graveyard teaches</a></li>
+      <li><a href="#bear">The bear case is structural</a></li>
+      <li><a href="#compounds">What actually compounds</a></li>
+      <li><a href="#verdict">The verdict</a></li>
+    </ol>
+  </div>
+
+  <h2 id="graveyard">1 · What the graveyard teaches</h2>
+
+  <div class="tablewrap">
+    <table>
+      <tr><th>Protocol</th><th>Status, Aug 2026</th><th>Cause and lesson</th></tr>
+      <tr><td>Goldfinch</td><td class="n">Wound down June 2026, ~$56M frozen</td><td>Backer-wisdom underwriting on offchain-opaque borrowers bred adverse selection; no continuous feed. <span class="badge official">official</span></td></tr>
+      <tr><td>TrueFi / Archblock</td><td class="n">Effectively dead; Archblock bankrupt</td><td>2022-era defaults never recovered.</td></tr>
+      <tr><td>Maple V1 delegates</td><td class="n">Dead</td><td>Orthogonal reported $2.5M of FTX exposure and defaulted on $36M; monthly self-reported financials are worthless in a fast crisis. Maple's fix was retreating to overcollateralization, which abandons the thesis rather than proving it.</td></tr>
+      <tr><td>Credora</td><td class="m">Acquired by RedStone (Sep 2025), relaunched as vault-risk oracle feeds</td><td>TEE-computed private ratings worked technically and trading firms accepted them; the standalone ratings business was too thin. Distribution as oracle feeds is where it found fit. And the ratings still missed Alameda: cryptography does not catch fraud by omission.</td></tr>
+      <tr><td>3Jane</td><td class="y">Live on Base, ~$31M TVL</td><td>Plaid plus Reclaim zkTLS in production: the exact pattern under study, at consumer scale. Nobody has run it at institutional trading-firm scale.</td></tr>
+      <tr><td>Clearpool, Huma, Centrifuge</td><td class="y">Alive</td><td>Survived by sitting in the money flow or tokenizing assets: sidestepping the monitoring problem rather than solving it.</td></tr>
+      <tr><td>Wildcat</td><td class="y">~$150M outstanding</td><td>No protocol underwriting by design; lenders do their own diligence. A data layer complements the model instead of replacing it, and V2 hooks are the ready-made attachment point.</td></tr>
+    </table>
+  </div>
+
+  <p>
+    Three lessons carry: continuous pull-based data beats self-reported
+    documents; derived-metrics distribution is where the value realizes
+    (Credora's acquirer bought methodology and track record, not raw data);
+    and completeness checks matter more than cryptography, because every
+    blow-up above was a hidden-liability problem, not a proof problem.
+  </p>
+
+  <h2 id="bear">2 · The bear case is structural</h2>
+
+  <div class="callout risk">
+    <span class="label">Say it plainly</span>
+    <p>Consent-based bank data is re-obtainable and non-exclusive by
+    construction. A competitor with the borrower's consent pulls the same 24
+    months of history in roughly one API call. Borrowers hold contractual
+    deletion rights over the raw archive. The end user owns the raw data
+    under Plaid's own MSA, and open-banking policy pushes portability
+    further. Raw data is not a moat, and pretending otherwise would misprice
+    the whole effort.</p>
+  </div>
+
+  <h2 id="compounds">3 · What actually compounds</h2>
+
+  <div class="grid cols-2">
+    <div class="card">
+      <h3>Longitudinal depth past month 24</h3>
+      <p class="small">Aggregator windows cap at two years. From month 25 the
+      cursor journal holds history no re-link can reproduce; through-a-cycle
+      cash-flow history on the same borrower is unpurchasable. It compounds
+      slowly and matters when tenor and renewal decisions use it.</p>
+    </div>
+    <div class="card">
+      <h3>The consent graph</h3>
+      <p class="small">Standing, monitored, contractually-teethed connections
+      to N borrowers: cure periods, coverage tests, rep letters. An
+      operational asset a competitor must renegotiate borrower by borrower.
+      Real, but shallow: switching friction, not lock-in.</p>
+    </div>
+    <div class="card">
+      <h3>The outcomes dataset</h3>
+      <p class="small">Cash-flow features joined to onchain credit outcomes:
+      repayments, delinquencies, covenant breaches, cure behavior, and
+      market-run dynamics that only Wildcat's seat can observe. Nobody else
+      holds the label side at the institutional-crypto frontier: not the
+      bureaus, not Plaid, not Credora-by-RedStone. This is proprietary
+      training data for credit models, and it is the thick part of the moat.</p>
+    </div>
+    <div class="card">
+      <h3>Cross-borrower structure</h3>
+      <p class="small">The counterparty graph across borrowers (shared
+      customers, shared funding sources, wash-detection) and peer benchmarks
+      are visible only from the platform seat, and they are what
+      clean-room-style analytics can later monetize.</p>
+    </div>
+  </div>
+
+  <h2 id="verdict">4 · The verdict</h2>
+
+  <div class="callout verdict">
+    <span class="label">Answer to core question 2</span>
+    <p><strong>Retaining the data creates a defensible advantage only if the
+    layer is built as a label factory.</strong> The moat is not the data:
+    raw bank history is a commodity any consented competitor re-pulls, and
+    Plaid's contracts plus borrower deletion rights make the raw archive a
+    license position, not property. It is partly the consent graph, real but
+    shallow. It is mostly the outcomes dataset: continuous cash-flow
+    features joined to onchain credit outcomes at a frontier where no
+    incumbent has labels. The design consequences are concrete: bitemporal
+    raw archive, reproducible metric runs, outcome tables joined from day
+    one, and distribution as signed attestations and feeds, because derived
+    scores are what get consumed. Wildcat's hooks make it the one protocol
+    where those attestations plug directly into market mechanics.</p>
+  </div>
+
+  <p>
+    One honest caveat to close on. For crypto-native trading firms, the bank
+    layer alone monitors the wrong pocket: exchange balances and prime-broker
+    exposure live outside bank rails, which is precisely the hole that
+    swallowed Maple and fooled Credora. The moat thesis holds for the data
+    layer as a whole only when exchange and custodian attestations ride
+    alongside the bank feed. Budget for both from the start.
+  </p>
+
+  <figure class="diagram">
+    <img src="assets/mascot/mascot-secrets.jpg" alt="Wildcat mascot: all right, then, keep your secrets" style="max-width:520px;width:100%;border-radius:10px;">
+    <figcaption>Kit reference art. The borrower keeps the raw secrets;
+    Wildcat keeps the labels. Everyone gets what they actually need.</figcaption>
+  </figure>
+
+  <div class="sources">
+    <h3>Sources</h3>
+    <p>Precedent citations, the mortality table and the defensibility
+    analysis live in <a href="research/research-F-architecture.md">research
+    stream F</a>; the contractual inputs come from
+    <a href="research/research-D-legal.md">stream D</a>.</p>
+  </div>
+
+  <div class="pager">
+    <a class="plain" href="architecture.html"><div class="card link-card"><span class="dir">Back</span><h3>Part IV · The data layer</h3></div></a>
+    <a class="plain" href="bd-primer.html"><div class="card link-card"><span class="dir">Next</span><h3>Primers</h3></div></a>
+  </div>
+
+</main>
+
+<footer class="site">
+  <div class="inner">
+    <img src="assets/wildcat-logo-white.svg" alt="Wildcat">
+    <span>Wildcat Labs · Shoggoth Fiat run · plaidcat</span>
+    <span class="spacer"></span>
+    <span>Let there be light.</span>
+  </div>
+</footer>
+
+</body>
+</html>

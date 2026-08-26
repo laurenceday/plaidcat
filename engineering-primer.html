@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Engineering primer: building against Plaid</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+<link rel="icon" href="assets/mascot.svg" type="image/svg+xml">
+</head>
+<body>
+
+<nav class="top">
+  <div class="bar">
+    <a class="logo" href="index.html"><img src="assets/wildcat-logo-white.svg" alt="Wildcat"><span>plaidcat</span></a>
+    <a class="item" href="index.html">Overview</a>
+    <a class="item" href="technical.html">Technical</a>
+    <a class="item" href="products.html">Products</a>
+    <a class="item" href="coverage.html">Coverage</a>
+    <a class="item" href="legal.html">Legal</a>
+    <a class="item" href="commercial.html">Commercial</a>
+    <a class="item" href="architecture.html">Architecture</a>
+    <a class="item" href="moat.html">Moat</a>
+    <span class="spacer"></span>
+    <span class="tag">Eng primer</span>
+  </div>
+</nav>
+
+<header class="page">
+  <div class="inner">
+    <span class="kicker">Primer · Engineering</span>
+    <h1>Building against Plaid without stepping on the rakes</h1>
+    <p class="lede">
+      The decisions that are cheap on day one and expensive on day ninety,
+      the integration bugs everyone hits, and the two-week prototype that
+      retires the real unknowns. Details live on the
+      <a href="technical.html">technical</a> and
+      <a href="architecture.html">architecture</a> pages.
+    </p>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <h2>Decisions that are irreversible at Link time</h2>
+  <ul>
+    <li><code>transactions.days_requested: 730</code>. The default is 90 and
+    it cannot be raised later without deleting the Item and re-linking the
+    borrower. Set it to the maximum, always.</li>
+    <li><code>assets</code> must be in the products array at Link if asset
+    reports will ever be wanted on that Item. It cannot be added later.</li>
+    <li><code>options.include_original_description: true</code>. B2B wires
+    and ACH rows resolve as low-confidence strings; the raw descriptor is
+    what classification runs on.</li>
+    <li>Request the business betas (account indicator, business categories)
+    through the account manager before onboarding real borrowers, not
+    after.</li>
+  </ul>
+
+  <h2>The integration bugs everyone hits</h2>
+  <div class="grid cols-2">
+    <div class="card"><h3>The unarmed webhook</h3><p class="small">
+    <code>SYNC_UPDATES_AVAILABLE</code> only fires after the first
+    <code>/transactions/sync</code> call on the Item. Call it immediately
+    after the token exchange or sit waiting for a webhook that never
+    comes.</p></div>
+    <div class="card"><h3>The inverted sign</h3><p class="small">Plaid's
+    <code>amount</code> is positive for outflows. Normalize to
+    positive-inflow once, at ingestion, and never let a raw sign reach the
+    metric engine.</p></div>
+    <div class="card"><h3>The eternal meter</h3><p class="small">An Item in
+    <code>ITEM_LOGIN_REQUIRED</code> bills its subscription until
+    <code>/item/remove</code> or <code>/item/products/terminate</code>.
+    Offboarding hygiene is a billing control.</p></div>
+    <div class="card"><h3>The trusted webhook</h3><p class="small">Webhooks
+    are unauthenticated HTTP posts until proven otherwise. Verify the ES256
+    JWT in <code>Plaid-Verification</code> against
+    <code>/webhook_verification_key/get</code>, compare the body hash, cache
+    keys by id, and make every handler idempotent: delivery is
+    at-least-once with 24-hour retries.</p></div>
+    <div class="card"><h3>The cursor mixup</h3><p class="small">One cursor
+    per Item stream; filtering by account creates separate streams. On a
+    mutation-during-pagination error, restart the whole update loop from
+    the first-page cursor, not the failed page. Store cursors atomically
+    with the rows they produced.</p></div>
+    <div class="card"><h3>The polling trap</h3><p class="small">
+    <code>/accounts/balance/get</code> is limited to five calls a minute per
+    Item and bills per call. Read cached balances from
+    <code>/accounts/get</code>; force real-time pulls only at decision
+    moments.</p></div>
+  </div>
+
+  <h2>Ops posture</h2>
+  <ul>
+    <li>Webhook-driven health dashboard keyed on <code>ERROR</code>,
+    <code>PENDING_DISCONNECT</code>, <code>PENDING_EXPIRATION</code>,
+    <code>LOGIN_REPAIRED</code>, <code>NEW_ACCOUNTS_AVAILABLE</code>.
+    Pre-empt scheduled breaks 30 days out with update-mode re-link
+    campaigns; expect 2 to 5% of Items to need attention monthly (lore, to
+    be measured in the first 90 days).</li>
+    <li>Consent expiry is data: <code>consent_expiration_time</code> on
+    <code>/item/get</code>, three-year consent logs on
+    <code>/consent/events/get</code>. Archive both.</li>
+    <li>Tokens: server-side only, KMS-encrypted, vaulted away from the
+    warehouse, referenced by opaque ids. <code>/item/access_token/invalidate</code>
+    rotates on suspicion. The production security questionnaire asks for all
+    of this in writing, so build it before the questionnaire, not after.</li>
+    <li>Staleness is a first-class published field, never an internal
+    embarrassment. Every metric bundle carries window, months used, coverage
+    ratio and staleness hours.</li>
+  </ul>
+
+  <h2>The two-week prototype</h2>
+  <p>
+    The full runbook is on the <a href="architecture.html#runbook">architecture
+    page</a>. The point of the spike: measure what research cannot. Actual
+    history depth returned by the borrower's institutions, business-indicator
+    population, counterparty confidence on real B2B flows, statement
+    availability, and the institution-specific surprises. Trial plan gives
+    ten free live Items; one friendly borrower is enough.
+  </p>
+
+  <h2>Where the effort actually goes</h2>
+  <div class="tablewrap">
+    <table>
+      <tr><th>Component</th><th>Effort</th><th>Note</th></tr>
+      <tr><td>Plaid ingestion (Link, exchange, sync, webhooks, health)</td><td>Weeks</td><td>Well-trodden; the gotchas above are most of it</td></tr>
+      <tr><td>Raw archive + warehouse</td><td>Weeks</td><td>Small data; Object Lock, KMS, bitemporal columns from day one</td></tr>
+      <tr><td>Classification</td><td>The long pole</td><td>Buy the commodity layer (Ntropy, Heron, Ocrolus for OCR), own the trading-firm classes vendors cannot do; audit every override</td></tr>
+      <tr><td>Metric engine</td><td>Weeks</td><td>Ten formulas, versioned code, input manifest hashes, reproducible runs</td></tr>
+      <tr><td>Distribution (signing, tear-sheets, EAS, hooks)</td><td>Weeks</td><td>Org key first, enclave key later; attestations expire and revoke</td></tr>
+      <tr><td>Item babysitting</td><td>Forever</td><td>0.25 to 0.5 FTE ongoing; contractual cure periods make it tractable</td></tr>
+    </table>
+  </div>
+
+  <figure class="diagram">
+    <img src="assets/mascot/mascot-borrow-revert.jpg" alt="Wildcat mascot two-panel: borrow succeeded, reverted" style="max-width:340px;width:100%;border-radius:10px;">
+    <figcaption>Kit reference art. Both panels ship to production
+    eventually.</figcaption>
+  </figure>
+
+  <div class="pager">
+    <a class="plain" href="bd-primer.html"><div class="card link-card"><span class="dir">Back</span><h3>BD primer</h3></div></a>
+    <a class="plain" href="legal-primer.html"><div class="card link-card"><span class="dir">Next</span><h3>Legal primer</h3></div></a>
+  </div>
+
+</main>
+
+<footer class="site">
+  <div class="inner">
+    <img src="assets/wildcat-logo-white.svg" alt="Wildcat">
+    <span>Wildcat Labs · Shoggoth Fiat run · plaidcat</span>
+    <span class="spacer"></span>
+    <span>Let there be light.</span>
+  </div>
+</footer>
+
+</body>
+</html>

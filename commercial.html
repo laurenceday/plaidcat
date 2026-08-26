@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Commercials: what it costs and what it takes to get in</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+<link rel="icon" href="assets/mascot.svg" type="image/svg+xml">
+</head>
+<body>
+
+<nav class="top">
+  <div class="bar">
+    <a class="logo" href="index.html"><img src="assets/wildcat-logo-white.svg" alt="Wildcat"><span>plaidcat</span></a>
+    <a class="item" href="index.html">Overview</a>
+    <a class="item" href="technical.html">Technical</a>
+    <a class="item" href="products.html">Products</a>
+    <a class="item" href="coverage.html">Coverage</a>
+    <a class="item" href="legal.html">Legal</a>
+    <a class="item active" href="commercial.html">Commercial</a>
+    <a class="item" href="architecture.html">Architecture</a>
+    <a class="item" href="moat.html">Moat</a>
+    <span class="spacer"></span>
+    <span class="tag">Commercials</span>
+  </div>
+</nav>
+
+<header class="page">
+  <div class="inner">
+    <span class="kicker">Commercials</span>
+    <h1>What it costs and what it takes to get in</h1>
+    <p class="lede">
+      Plaid will not be a material line item. The binding constraints are
+      procedural (production approval of a DeFi-adjacent use case) and
+      contractual (auto-renewal, rate rights, no SLA), not price. Numbers
+      below mix official structure with operator-reported price points;
+      labels mark which is which.
+    </p>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <div class="toc">
+    <span class="label">On this page</span>
+    <ol>
+      <li><a href="#structure">How Plaid bills</a></li>
+      <li><a href="#model">The Wildcat cost model</a></li>
+      <li><a href="#production">Getting approved, including the crypto question</a></li>
+      <li><a href="#msa">Contract terms that matter</a></li>
+      <li><a href="#risks">Three commercial risks</a></li>
+    </ol>
+  </div>
+
+  <h2 id="structure">1 · How Plaid bills</h2>
+
+  <ul>
+    <li><strong>Plans.</strong> Free Trial (ten live production Items),
+    pay-as-you-go with no minimum, Growth with a minimum and annual commit,
+    Custom above that. Rates appear at production signup, not in public.
+    <span class="badge official">official</span></li>
+    <li><strong>Three billing models.</strong> One-time per Item (Auth about
+    $1.00 to $1.25, Identity about $1.10), subscription per Item per month
+    (Transactions about $0.25 to $0.30 reported), and per-request or flexible
+    (Balance about $0.05, Asset Reports about $3 to $5, Statements scaled by
+    statement count). <span class="badge reported">operator-reported</span></li>
+    <li><strong>The 2-year backfill is cheap.</strong> History past 61 days
+    costs one flat Additional History fee per Item, whatever the depth.
+    <span class="badge official">official</span></li>
+    <li><strong>The billing gotchas.</strong> An Item in an error state keeps
+    billing its subscription until removed; Plaid's own docs warn about being
+    billed indefinitely. No pro-rating. Asset reports covering more than five
+    Items multiply the fee. Re-links can re-trigger one-time fees.
+    <span class="badge official">official</span></li>
+    <li><strong>Rate limits are irrelevant at Wildcat scale,</strong> except
+    the five-per-minute per-Item balance check, which only bites naive
+    polling. <span class="badge official">official</span></li>
+  </ul>
+
+  <h2 id="model">2 · The Wildcat cost model</h2>
+
+  <p>
+    Assumptions: two Items per borrower; onboarding pulls identity and a
+    730-day history; monitoring runs the transactions subscription with two
+    on-demand refreshes per Item per month; one asset report per borrower per
+    quarter; statements monthly where supported (about 60% of institutions).
+    Estimated line items use the operator-reported price points above; the
+    full arithmetic is in stream E. Per borrower this lands near $58 in year
+    one. <span class="badge inferred">estimate</span>
+  </p>
+
+  <div class="tablewrap">
+    <table>
+      <tr><th>Scale</th><th>Usage-based spend</th><th>What actually bills</th><th>Modeled annual Plaid spend</th></tr>
+      <tr><td>20 borrowers (40 Items)</td><td>~$1,160</td><td>Pay-as-you-go viable; any committed plan's floor dominates</td><td>$1.2k to $6k</td></tr>
+      <tr><td>100 borrowers (200 Items)</td><td>~$5,800</td><td>At or below common plan minimums; matches Vendr's $9k median Plaid contract across 39 verified purchases</td><td>$6k to $12k</td></tr>
+      <tr><td>500 borrowers (1,000 Items)</td><td>~$29,000</td><td>Growth or Custom commitment with volume discounts; doubling every estimated line item caps it near $48k</td><td>$22k to $48k</td></tr>
+    </table>
+  </div>
+
+  <p class="small">
+    Not modeled: integration engineering, a second aggregator (Codat's
+    accounting-data platform runs roughly $12k to $24k a year and may be the
+    more relevant complement for corporates), and item-hygiene automation.
+    Plan minimums, not unit prices, drive spend below about 200 borrowers.
+    <span class="badge reported">operator-reported</span>
+  </p>
+
+  <h2 id="production">3 · Getting approved, including the crypto question</h2>
+
+  <ul>
+    <li><strong>Process.</strong> Dashboard application, use-case review by
+    Plaid's Customer Oversight team, billing setup, about a week, then
+    per-institution OAuth registration; the security questionnaire gates
+    certain banks and is effectively SOC 2-shaped.
+    <span class="badge official">official</span></li>
+    <li><strong>Crypto is not a policy bar.</strong> Plaid names Coinbase and
+    Gemini as customers, runs a dedicated crypto use-case page, and added
+    read-only exchange data in 2022. No prohibited-industries bar touches
+    the data products; only the Transfer payments product carries one. No
+    rejection reports of crypto firms surfaced.
+    <span class="badge official">official</span></li>
+    <li><strong>The residual risk is contractual.</strong> The MSA permits
+    immediate suspension for legal violations or reputational harm, and the
+    Developer Policy reserves broad termination rights. A DeFi credit
+    protocol is a novel oversight profile: expect deeper diligence and
+    slower onboarding, and present the use case as commercial-lending
+    underwriting and monitoring with a clean borrower consent flow. Get the
+    use case, including derived-metric publication, approved in writing in
+    the order form. <span class="badge inferred">inferred</span></li>
+  </ul>
+
+  <h2 id="msa">4 · Contract terms that matter</h2>
+
+  <div class="grid cols-2">
+    <div class="card"><h3>Renewal mechanics</h3><p class="small">Twelve-month
+    initial term, auto-renewing yearly; non-renewal needs 60 days' notice;
+    Plaid may raise any rate at renewal on 30 days' notice; operators report
+    5-10% annual escalators. Calendar the notice window.
+    <span class="badge official">official</span></p></div>
+    <div class="card"><h3>No SLA</h3><p class="small">The standard MSA
+    carries no uptime commitment and none is published anywhere. For a
+    protocol whose covenants depend on monitoring feeds, this is the real
+    exposure; negotiate service credits or design for staleness.
+    <span class="badge inferred">inferred from absence</span></p></div>
+    <div class="card"><h3>Money terms</h3><p class="small">Net-15, 1.5%
+    monthly late interest, payments non-refundable and non-cancellable; an
+    unused minimum is sunk. Termination for material breach carries only a
+    10-day cure. <span class="badge official">official</span></p></div>
+    <div class="card"><h3>Exit mechanics</h3><p class="small">On termination:
+    30 days to download client data, deletion on request, and already-pulled
+    end-user data stays in Wildcat's systems but remains bound by the MSA's
+    use limits. Convert raw pulls into derived underwriting records before
+    any exit; Items never port between aggregators, though a small corporate
+    borrower base re-links by email campaign.
+    <span class="badge official">official</span></p></div>
+  </div>
+
+  <p>
+    On the bank-fee overhang: JPMorgan's per-pull fees are live and Plaid
+    signed, saying publicly that customer contracts and pricing are unchanged
+    at this time. No premium-institution surcharge exists as of August 2026.
+    The pass-through vehicle, if it comes, is the renewal-rate clause.
+    <span class="badge official">official</span>
+  </p>
+
+  <h2 id="risks">5 · Three commercial risks</h2>
+
+  <div class="callout risk">
+    <span class="label">Risk 1 · Approval and unilateral termination</span>
+    <p>Plaid happily serves crypto exchanges, but a DeFi credit protocol is
+    novel to its oversight team, and the MSA's suspension rights hang over
+    the integration permanently. Mitigate with the written use-case approval,
+    derived records outside the raw-data restrictions, and a warm second
+    aggregator path.</p>
+  </div>
+  <div class="callout risk">
+    <span class="label">Risk 2 · Renewal-time escalation</span>
+    <p>The industry now has a legitimized bank-fee model and Plaid holds a
+    unilateral renewal-rate right. Budget the escalator, calendar the 60-day
+    window, and keep usage portable.</p>
+  </div>
+  <div class="callout risk">
+    <span class="label">Risk 3 · No SLA plus silent meters</span>
+    <p>No uptime commitment, errored Items billing forever, multiplier fees
+    on big reports. An ops-discipline tax rather than a dollar risk at this
+    scale, but the SLA gap matters if covenants depend on the feed.</p>
+  </div>
+
+  <figure class="diagram">
+    <img src="assets/mascot/mascot-victorian.jpg" alt="Wildcat mascot as a Victorian banker with ledger and contract" style="max-width:480px;width:100%;border-radius:10px;">
+    <figcaption>Kit reference art. The names on the ledger change; the
+    renewal clause is eternal.</figcaption>
+  </figure>
+
+  <div class="sources">
+    <h3>Sources</h3>
+    <p>Full arithmetic, price-point provenance and contract citations live in
+    <a href="research/research-E-pricing.md">research stream E</a>. Primary:
+    Plaid billing docs and plan pages, the SEC-filed MSA, Vendr and
+    PriceLevel procurement data, and 2025-26 press on the JPMorgan
+    agreements.</p>
+  </div>
+
+  <div class="pager">
+    <a class="plain" href="legal.html"><div class="card link-card"><span class="dir">Back</span><h3>Data rights &amp; law</h3></div></a>
+    <a class="plain" href="architecture.html"><div class="card link-card"><span class="dir">Next</span><h3>Part IV · The data layer</h3></div></a>
+  </div>
+
+</main>
+
+<footer class="site">
+  <div class="inner">
+    <img src="assets/wildcat-logo-white.svg" alt="Wildcat">
+    <span>Wildcat Labs · Shoggoth Fiat run · plaidcat</span>
+    <span class="spacer"></span>
+    <span>Let there be light.</span>
+  </div>
+</footer>
+
+</body>
+</html>

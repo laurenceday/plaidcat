@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Data rights: who owns what, and what actually binds</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+<link rel="icon" href="assets/mascot.svg" type="image/svg+xml">
+</head>
+<body>
+
+<nav class="top">
+  <div class="bar">
+    <a class="logo" href="index.html"><img src="assets/wildcat-logo-white.svg" alt="Wildcat"><span>plaidcat</span></a>
+    <a class="item" href="index.html">Overview</a>
+    <a class="item" href="technical.html">Technical</a>
+    <a class="item" href="products.html">Products</a>
+    <a class="item" href="coverage.html">Coverage</a>
+    <a class="item active" href="legal.html">Legal</a>
+    <a class="item" href="commercial.html">Commercial</a>
+    <a class="item" href="architecture.html">Architecture</a>
+    <a class="item" href="moat.html">Moat</a>
+    <span class="spacer"></span>
+    <span class="tag">Data rights</span>
+  </div>
+</nav>
+
+<header class="page">
+  <div class="inner">
+    <span class="kicker">Data rights &amp; law</span>
+    <h1>Who owns what, and what actually binds</h1>
+    <p class="lede">
+      The binding constraints on Wildcat's data ambitions are contract, not
+      law. Plaid's full standard MSA is public because a customer filed it
+      with the SEC, so this page works from actual clause text. Not legal
+      advice; re-verify quotes against live pages before relying on them.
+    </p>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <div class="toc">
+    <span class="label">On this page</span>
+    <ol>
+      <li><a href="#ownership">Ownership under Plaid's paper</a></li>
+      <li><a href="#sharing">The re-sharing pattern, tested</a></li>
+      <li><a href="#1033">1033 and the regulatory weather</a></li>
+      <li><a href="#statutes">GLBA, FCRA, CCPA, GDPR</a></li>
+      <li><a href="#precedents">How others structure it</a></li>
+      <li><a href="#ranked">Real constraints, ranked, against paper tigers</a></li>
+    </ol>
+  </div>
+
+  <h2 id="ownership">1 · Ownership under Plaid's paper</h2>
+
+  <p>
+    Three clauses do most of the work. All quoted from the standard Plaid MSA
+    as filed on SEC EDGAR (Live Oak Financial Form 1-A exhibit) and Plaid's
+    Developer Policy. <span class="badge official">official</span>
+  </p>
+
+  <div class="grid cols-2">
+    <div class="card">
+      <h3>The end user owns the raw data</h3>
+      <p class="small">Plaid "reserves and retains all right, title, and
+      interest in the Services and related Output (except for raw End User
+      data, which belongs to the End User)." Wildcat owns neither the raw
+      data nor the Output. It holds a revocable license position.</p>
+    </div>
+    <div class="card">
+      <h3>Use is welded to the approved use case</h3>
+      <p class="small">Output "must [be] use[d] solely in their Client
+      Application for the use case permitted by Plaid in writing." Anything
+      beyond that use case needs Plaid's written approval, independent of
+      what the borrower consented to.</p>
+    </div>
+    <div class="card">
+      <h3>No resale, no unconsented disclosure</h3>
+      <p class="small">Clients "cannot sell, resell, license, sublicense,
+      distribute, rent or lease any Services or Output to any third party"
+      absent written agreement, and will not "disclose, transfer, syndicate
+      or distribute End User Data to any third party (including its
+      Permitted Service Providers)" without the end user's Express Consent.</p>
+    </div>
+    <div class="card">
+      <h3>Deletion on request is contractual</h3>
+      <p class="small">The client "will promptly Delete any FI Data upon
+      request by the applicable End User," law-required retention excepted.
+      Borrower deletion rights exist here even where no statute grants them.</p>
+    </div>
+  </div>
+
+  <div class="callout warn">
+    <span class="label">The one-sided carve-out</span>
+    <p>The MSA's de-identified-data clause runs only in Plaid's favor:
+    "Plaid may use, reproduce, disclose, or otherwise exploit de-identified
+    or anonymized Client Data ... in any way in Plaid's sole discretion."
+    No symmetric customer right appears anywhere in the public text. Whether
+    a derived metric stops being "Output" once transformed is undefined.
+    This is Wildcat's number-one negotiation item: get an explicit
+    customer-side derived-data and de-identified-data right written into the
+    order form, alongside written approval of the full use case including
+    derived-metric publication. <span class="badge official">official</span></p>
+  </div>
+
+  <p>
+    Two more facts worth carrying. Plaid and the banks hold audit rights over
+    Wildcat: documentation demands, Plaid-approved third-party audits, and
+    technical assessments by Plaid or a financial institution, at most yearly
+    unless law requires more. And there is no public precedent of Plaid
+    enforcing against a customer for building a retained dataset; the known
+    litigation ran against Plaid itself (the $58M privacy settlement of
+    2022, which is why its consent tooling is now strict). Dormant is not
+    absent. <span class="badge inferred">inferred</span>
+  </p>
+
+  <h2 id="sharing">2 · The re-sharing pattern, tested</h2>
+
+  <p>
+    The brief's pattern: Wildcat holds raw data, analysts get scoped access,
+    lenders get derived metrics only. Plaid's own paper contemplates onward
+    sharing through exactly two doors, and the pattern fits through them.
+  </p>
+
+  <figure class="diagram">
+    <svg viewBox="0 0 920 320" role="img" aria-label="Two sanctioned doors for third-party access under the Plaid MSA">
+      <defs>
+        <marker id="arr4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" fill="#30313E"/>
+        </marker>
+      </defs>
+      <g font-family="'Liberation Sans', Arial, sans-serif" font-size="13" fill="#141414">
+        <rect x="330" y="30" width="260" height="58" rx="12" fill="#1B1530" stroke="#4D26BC" stroke-width="1.5"/>
+        <text x="460" y="55" text-anchor="middle" font-weight="bold" fill="#FFFFFF">Wildcat (Plaid client)</text>
+        <text x="460" y="74" text-anchor="middle" font-size="11" fill="#BEBECE">approved use case + Express Consent</text>
+
+        <rect x="60" y="160" width="240" height="72" rx="12" fill="#FCFCFC" stroke="#141414" stroke-width="1.5"/>
+        <text x="180" y="185" text-anchor="middle" font-weight="bold">Permitted Service Providers</text>
+        <text x="180" y="203" text-anchor="middle" font-size="11" fill="#8A8C9F">analysts working on Wildcat's behalf,</text>
+        <text x="180" y="217" text-anchor="middle" font-size="11" fill="#8A8C9F">papered, no independent use, Wildcat liable</text>
+
+        <rect x="350" y="160" width="220" height="72" rx="12" fill="#FCFCFC" stroke="#141414" stroke-width="1.5"/>
+        <text x="460" y="185" text-anchor="middle" font-weight="bold">Flow-down recipients</text>
+        <text x="460" y="203" text-anchor="middle" font-size="11" fill="#8A8C9F">lenders under written flow-down terms</text>
+        <text x="460" y="217" text-anchor="middle" font-size="11" fill="#8A8C9F">receiving recognizably Plaid-sourced data</text>
+
+        <rect x="620" y="160" width="240" height="72" rx="12" fill="#FCFCFC" stroke="#3E68FF" stroke-width="1.5"/>
+        <text x="740" y="185" text-anchor="middle" font-weight="bold">Plaid-intermediated rails</text>
+        <text x="740" y="203" text-anchor="middle" font-size="11" fill="#8A8C9F">Relay + Audit Copy: recipient is</text>
+        <text x="740" y="217" text-anchor="middle" font-size="11" fill="#8A8C9F">Plaid-registered; consent lives inside Plaid</text>
+
+        <line x1="380" y1="88" x2="200" y2="152" stroke="#30313E" stroke-width="1.5" marker-end="url(#arr4)"/>
+        <line x1="460" y1="88" x2="460" y2="152" stroke="#30313E" stroke-width="1.5" marker-end="url(#arr4)"/>
+        <line x1="540" y1="88" x2="720" y2="152" stroke="#30313E" stroke-width="1.5" marker-end="url(#arr4)"/>
+
+        <text x="180" y="270" text-anchor="middle" font-size="11" fill="#157A47">right home for DeFi Llama-style analysts</text>
+        <text x="460" y="270" text-anchor="middle" font-size="11" fill="#157A47">right home for lender tear-sheets</text>
+        <text x="740" y="270" text-anchor="middle" font-size="11" fill="#157A47">right home for auditors</text>
+        <text x="460" y="300" text-anchor="middle" font-size="11" fill="#C24647">a public dashboard is none of these: it needs named borrower consent and non-reidentifiable metrics</text>
+      </g>
+    </svg>
+    <figcaption>Three structurable homes for third parties. Independent
+    redistribution of raw data fits nowhere.</figcaption>
+  </figure>
+
+  <ul>
+    <li><strong>Analysts as service providers.</strong> DeFi Llama, an
+    accounting firm, or a ratings boutique gets papered as Wildcat's
+    Permitted Service Provider: processes only for Wildcat, no independent
+    use, deletion duties, security terms, Plaid restrictions flowed down.
+    Their access still requires the borrower's Express Consent naming the
+    category of recipient.</li>
+    <li><strong>Lenders as flow-down recipients.</strong> Where what lenders
+    receive is recognizably Plaid-sourced, Plaid's End Client Flow Down
+    Terms apply: written agreements, use restrictions, Wildcat strictly
+    liable. Genuinely derived, entity-level metrics argue for a lighter
+    touch, but the paper is safest read broadly.</li>
+    <li><strong>Consent drafting.</strong> The MSA's standard: clear and
+    conspicuous, naming the data categories received and how they will be
+    used, stored and processed. For this model the consent must also name
+    retention, derivation, the recipient categories, and any publication of
+    derived metrics. If dashboards will be public, say so in the consent, in
+    those words.</li>
+    <li><strong>Who consents for an LLC.</strong> Plaid's framework handles
+    entities only through an authority representation. The valid consenting
+    party is a person with authority to bind the company and access the
+    account. An onboarding representation plus an officer's certificate
+    closes the gap; it is also the likeliest complaint vector if skipped.</li>
+  </ul>
+
+  <h2 id="1033">3 · 1033 and the regulatory weather</h2>
+
+  <div class="tablewrap">
+    <table>
+      <tr><th>Date</th><th>What happened</th></tr>
+      <tr><td>2024-10-22</td><td>CFPB finalizes the Personal Financial Data Rights rule; banks sue the same day.</td></tr>
+      <tr><td>2025-05</td><td>New-administration CFPB tells the court the rule is unlawful and should be vacated.</td></tr>
+      <tr><td>2025-08</td><td>CFPB pivots to reconsideration; advance notice reopens fees, third-party definitions, privacy and security.</td></tr>
+      <tr><td>2025-10-29</td><td>E.D. Kentucky preliminarily enjoins enforcement, finding the banks likely to succeed on all four claims. Enjoined, not vacated.</td></tr>
+      <tr><td>2026-04-01</td><td>First compliance deadline passes without effect.</td></tr>
+      <tr><td>2026-08-06</td><td>A revised "Reconsideration" proposal reaches OIRA. Expect a weaker, fee-permissive rule on a multi-year runway.</td></tr>
+    </table>
+  </div>
+
+  <div class="callout note">
+    <span class="label">Why Wildcat mostly does not care</span>
+    <p>1033 covers consumer asset accounts under Regulation E and credit
+    cards under Regulation Z. Corporate deposit accounts were never in it.
+    The rule is neither a compliance burden nor an access right for this
+    model: Wildcat cannot invoke it to force a bank to serve business-account
+    data, and access rests entirely on Plaid's bilateral bank agreements.
+    Two things still matter. The rule's hygiene architecture (no secondary
+    use without authorization, 12-month reauthorization, easy revocation) is
+    the market's template for what good consent looks like. And New York's
+    proposed Financial Data Rights Act would cover small-business data with
+    penalties up to $10,000 per violation: the sleeper to watch.
+    <span class="badge official">official</span></p>
+  </div>
+
+  <p>
+    The adjacent weather is bank economics. JPMorgan's paid data-access
+    regime went live through 2025 and covers over 95% of its pulls; Wells
+    Fargo and PNC steer fintechs toward bank-owned Akoya; the revised federal
+    proposal reopens the fee question. No statute obliges any US bank to
+    serve business-account data at all. Supply continuity, not privacy law,
+    is the long-run threat to the dataset.
+    <span class="badge official">official</span>
+  </p>
+
+  <h2 id="statutes">4 · GLBA, FCRA, CCPA, GDPR</h2>
+
+  <div class="grid cols-2">
+    <div class="card"><h3>GLBA</h3><p class="small">Protects natural persons'
+    personal-purpose data. Business-purpose account data is not nonpublic
+    personal information. Two residues: screen out sole-prop and personal
+    accounts at intake, and expect Safeguards-grade security anyway because
+    Plaid's flow-downs require it.</p></div>
+    <div class="card"><h3>FCRA</h3><p class="small">Entity-only reporting for
+    commercial credit is federally unregulated; that is the Dun &amp;
+    Bradstreet model. The tripwire is individuals: furnish data bearing on a
+    guarantor or sole proprietor for credit decisions and Wildcat becomes a
+    consumer reporting agency with accuracy, dispute and permissible-purpose
+    duties. Plaid built Plaid Check precisely to absorb that role. Report on
+    entities; route guarantor analytics through an existing CRA or accept
+    CRA status deliberately.</p></div>
+    <div class="card"><h3>CCPA</h3><p class="small">The B2B exemption expired
+    in 2023. California individuals inside the dataset, signers and the
+    people named in transaction descriptors, hold access and deletion
+    rights. The LLC itself holds none. Tokenize names at ingestion and the
+    problem shrinks.</p></div>
+    <div class="card"><h3>GDPR / UK</h3><p class="small">Business transaction
+    streams are saturated with personal data: payroll lines, sole-trader
+    counterparties, directors. For EU/UK borrowers Wildcat is a controller
+    of that embedded data, needs a lawful basis, and faces erasure requests
+    from people who never consented. PSD2 covers SME accounts and imposes
+    purpose limitation; public per-borrower dashboards are hard to justify.
+    Strip and tokenize person-identifying strings at ingestion.</p></div>
+  </div>
+
+  <h2 id="precedents">5 · How others structure it</h2>
+
+  <ul>
+    <li><strong>Dun &amp; Bradstreet:</strong> consentless commercial
+    reporting, possible only because entity-level reporting is unregulated.
+    FTC polices deception, not the model.</li>
+    <li><strong>Enigma:</strong> buys anonymized card-panel data aggregated
+    on the bank side, sells merchant-level revenue signals. The cleanest
+    precedent for selling business-level metrics derived from bank data:
+    anonymize before it moves, output only entity-level.</li>
+    <li><strong>Heron Data's terms:</strong> the vendor "retains ownership of
+    any data that is based on or derived from the customer data." Expect
+    Wildcat's own analytics vendors to try that clause on Wildcat; strike
+    it. <span class="badge official">official</span></li>
+    <li><strong>Validis:</strong> sells restraint (permissioned, traceable,
+    never trains models) to the lender-audit segment. A viable posture for
+    winning conservative counterparties.</li>
+  </ul>
+
+  <h2 id="ranked">6 · Real constraints, ranked, against paper tigers</h2>
+
+  <div class="tablewrap">
+    <table>
+      <tr><th>#</th><th>Real constraint</th><th>Why it binds</th></tr>
+      <tr><td>1</td><td>Plaid's use-case and no-resale clauses</td><td>The dataset is a license position, terminable by Plaid. Negotiate written use-case approval covering retention, derivation, service-provider access and metric publication, plus a customer-side derived-data clause.</td></tr>
+      <tr><td>2</td><td>Borrower deletion and revocation rights</td><td>Contractual even where no statute applies; a departing borrower can gut the raw archive. Value must persist in non-reidentifiable derived layers.</td></tr>
+      <tr><td>3</td><td>Bank-side commercial power</td><td>Business-account API coverage is voluntary; fees are live at JPMC and spreading. Banks can reprice or cut endpoints at will.</td></tr>
+      <tr><td>4</td><td>Consent-scope integrity for entities</td><td>The whole edifice rests on the authority of whoever clicked Link and on consent text that covers what Wildcat actually does. Cheap to fix, poisonous to skip.</td></tr>
+      <tr><td>5</td><td>FCRA at the individual boundary</td><td>Sole props and guarantors pull the model into consumer reporting. Screen at intake.</td></tr>
+      <tr><td>6</td><td>GDPR/CCPA for embedded individuals</td><td>Manageable with tokenization; fatal to public raw dashboards.</td></tr>
+      <tr><td>7</td><td>Plaid and bank audit rights</td><td>The enforcement mechanism for 1 through 4.</td></tr>
+    </table>
+  </div>
+
+  <p><strong>Paper tigers:</strong> 1033 in any version (enjoined,
+  consumer-only, being rewritten weaker); GLBA for corporate data; federal
+  regulation of commercial credit reporting (none exists); bank common-law
+  confidentiality (waived by consent, reaches Wildcat only through the
+  contracts already counted); and Plaid's enforcement history against
+  integrators (none public, which is not the same as none possible).</p>
+
+  <figure class="diagram">
+    <img src="assets/mascot/mascot-judge.jpg" alt="Wildcat mascot in judicial robes: you had the capability, so you had the obligation" style="max-width:400px;width:100%;border-radius:10px;">
+    <figcaption>Kit reference art. The caption is truer of contract than of
+    statute here: capability comes from Plaid's paper, and so do the
+    obligations.</figcaption>
+  </figure>
+
+  <div class="sources">
+    <h3>Sources</h3>
+    <p>Full per-claim citations, clause quotes and the litigation timeline
+    live in <a href="research/research-D-legal.md">research stream D</a>.
+    Primary: the Plaid MSA as filed on SEC EDGAR, Plaid's Developer Policy,
+    Terms of Use and End User Privacy Policy, eCFR Part 1033 text, the
+    E.D. Kentucky injunction coverage, law-firm alerts from 2024 through
+    2026, and the FTC and OCC materials on commercial credit reporting.
+    Quotes were captured through search extraction and marked for
+    re-verification against live pages. Nothing on this page is legal
+    advice.</p>
+  </div>
+
+  <div class="pager">
+    <a class="plain" href="coverage.html"><div class="card link-card"><span class="dir">Back</span><h3>Part III · Business accounts</h3></div></a>
+    <a class="plain" href="commercial.html"><div class="card link-card"><span class="dir">Next</span><h3>Commercials</h3></div></a>
+  </div>
+
+</main>
+
+<footer class="site">
+  <div class="inner">
+    <img src="assets/wildcat-logo-white.svg" alt="Wildcat">
+    <span>Wildcat Labs · Shoggoth Fiat run · plaidcat</span>
+    <span class="spacer"></span>
+    <span>Let there be light.</span>
+  </div>
+</footer>
+
+</body>
+</html>

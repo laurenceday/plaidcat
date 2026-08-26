@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BD primer: pitching the data layer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+<link rel="icon" href="assets/mascot.svg" type="image/svg+xml">
+</head>
+<body>
+
+<nav class="top">
+  <div class="bar">
+    <a class="logo" href="index.html"><img src="assets/wildcat-logo-white.svg" alt="Wildcat"><span>plaidcat</span></a>
+    <a class="item" href="index.html">Overview</a>
+    <a class="item" href="technical.html">Technical</a>
+    <a class="item" href="products.html">Products</a>
+    <a class="item" href="coverage.html">Coverage</a>
+    <a class="item" href="legal.html">Legal</a>
+    <a class="item" href="commercial.html">Commercial</a>
+    <a class="item" href="architecture.html">Architecture</a>
+    <a class="item" href="moat.html">Moat</a>
+    <span class="spacer"></span>
+    <span class="tag">BD primer</span>
+  </div>
+</nav>
+
+<header class="page">
+  <div class="inner">
+    <span class="kicker">Primer · Business development</span>
+    <h1>Pitching the data layer without overselling it</h1>
+    <p class="lede">
+      What to promise borrowers, lenders, analytics partners and Plaid, and
+      the exact places where a well-meant sentence becomes a contract
+      problem. Everything here compresses the seven explainer pages; follow
+      the links when someone pushes back.
+    </p>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <h2>The one-paragraph pitch</h2>
+  <p>
+    Wildcat borrowers connect their operating accounts once, through the same
+    Plaid flow they already use elsewhere. Wildcat keeps a permissioned,
+    continuously updated picture of borrower cash flows, computes agreed
+    credit metrics, and hands lenders signed, dated tear-sheets and onchain
+    attestations. Analysts the borrower approves can compute against defined
+    slices under contract. Raw transactions never reach lenders and never go
+    public. Borrowers can see, restrict, and revoke everything.
+  </p>
+
+  <h2>Promises that hold</h2>
+  <div class="grid cols-2">
+    <div class="card"><h3>To borrowers</h3><p class="small">One connect, not a
+    monthly document chase. Scoped consent naming exactly what Wildcat sees
+    and who computes on it. Revocation and deletion rights that actually
+    bind, because Plaid's contracts impose them on Wildcat regardless of
+    statute. Better terms as the reward for transparency.</p></div>
+    <div class="card"><h3>To lenders</h3><p class="small">Continuous
+    monitoring instead of quarterly PDFs: metrics refreshed from feeds
+    pulled one to four times a day, staleness always visible, coverage
+    always measured. Signed bundles whose formulas are published. A lapsed
+    or degraded feed surfaces as its own signal instead of silence.</p></div>
+    <div class="card"><h3>To analytics partners</h3><p class="small">Scoped,
+    audited access to defined slices under a service-provider agreement,
+    with published disclosure thresholds. Their brand on the derived
+    analytics lenders see.</p></div>
+    <div class="card"><h3>To Plaid</h3><p class="small">A commercial-lending
+    underwriting and monitoring use case with a clean consent flow, from a
+    team that passes a SOC 2-shaped questionnaire. Plaid already serves
+    Coinbase and Gemini; this is inside their comfort zone if presented as
+    lending, not as "DeFi data".</p></div>
+  </div>
+
+  <h2>Sentences that create problems</h2>
+  <ul>
+    <li><strong>"Wildcat owns the data."</strong> It does not. The borrower
+    owns the raw data; Wildcat holds a license tied to a Plaid-approved use
+    case. Say "Wildcat holds and controls access under the borrower's
+    permission." The <a href="legal.html">legal page</a> has the clauses.</li>
+    <li><strong>"We can see all their banking."</strong> Treasury portals at
+    large banks are invisible to every aggregator, and trading firms' fiat
+    rails mostly do not link. Coverage by archetype is on the
+    <a href="coverage.html">coverage page</a>; quote those numbers, not
+    "everything".</li>
+    <li><strong>"We'll publish borrower dashboards."</strong> Public
+    per-borrower metrics need named consent in the borrower's paperwork and
+    a defensible non-reidentifiability position. Never promise a public
+    dashboard before legal signs the consent text.</li>
+    <li><strong>"Real-time".</strong> The feed refreshes one to four times a
+    day with a paid on-demand refresh for decision moments. Say
+    "continuous", never "real-time".</li>
+    <li><strong>"It's like a credit bureau."</strong> Only for entities. The
+    moment guarantors or sole proprietors enter the picture, consumer
+    reporting law does too. Leave that sentence to counsel.</li>
+  </ul>
+
+  <h2>Objection handling</h2>
+  <div class="tablewrap">
+    <table>
+      <tr><th>Objection</th><th>Answer</th></tr>
+      <tr><td>Borrower: "You'll see everything we do."</td><td>Consent names the accounts and the data types; raw rows stay inside Wildcat's perimeter; lenders get ten agreed metrics with the formulas published; revocation is two clicks and deletion is contractual.</td></tr>
+      <tr><td>Borrower: "Our treasury team can't hand out the owner login."</td><td>Correct, and the onboarding runbook handles it: the credential owner runs Link once, OAuth keeps the bank's own MFA, and no credentials ever touch Wildcat or Plaid on the OAuth path.</td></tr>
+      <tr><td>Lender: "Why trust Wildcat's numbers?"</td><td>Signed bundles, published formulas, coverage and freshness embedded, an upgrade path to enclave-signed computation, and attestations consumable straight from hooks. And the honest limit stated: bank data does not see exchange exposure, so trading-firm monitoring pairs with exchange attestations.</td></tr>
+      <tr><td>Partner: "We want to hold the data ourselves."</td><td>No. Partners compute against Wildcat's perimeter as service providers. That boundary is what makes the borrower consent and the Plaid contract work at all.</td></tr>
+      <tr><td>Anyone: "Didn't Maple/Goldfinch prove this fails?"</td><td>They proved self-reported documents fail. Continuous pull-based feeds with completeness checks are the fix, and the one live protocol running this exact pattern (3Jane) is growing. The <a href="moat.html">moat page</a> has the mortality table.</td></tr>
+    </table>
+  </div>
+
+  <h2>The asks that matter in the Plaid negotiation</h2>
+  <ol>
+    <li>Written use-case approval covering retention, derivation,
+    service-provider analytics access, and derived-metric distribution.</li>
+    <li>A customer-side derived and de-identified data clause mirroring the
+    one Plaid wrote for itself.</li>
+    <li>The Transactions-for-Business betas: business-account indicator and
+    business categories.</li>
+    <li>Transactions Refresh and Statements product access.</li>
+    <li>An SLA or service credits, since the standard MSA has none.</li>
+    <li>Calendar the renewal: 60-day non-renewal notice, 30-day rate-change
+    notice.</li>
+  </ol>
+
+  <figure class="diagram">
+    <img src="assets/mascot/mascot-confused.jpg" alt="Wildcat mascot gesturing: but the people are confused" style="max-width:380px;width:100%;border-radius:10px;">
+    <figcaption>Kit reference art. The people stop being confused when the
+    pitch matches the paper.</figcaption>
+  </figure>
+
+  <div class="pager">
+    <a class="plain" href="moat.html"><div class="card link-card"><span class="dir">Back</span><h3>The moat verdict</h3></div></a>
+    <a class="plain" href="engineering-primer.html"><div class="card link-card"><span class="dir">Next</span><h3>Engineering primer</h3></div></a>
+  </div>
+
+</main>
+
+<footer class="site">
+  <div class="inner">
+    <img src="assets/wildcat-logo-white.svg" alt="Wildcat">
+    <span>Wildcat Labs · Shoggoth Fiat run · plaidcat</span>
+    <span class="spacer"></span>
+    <span>Let there be light.</span>
+  </div>
+</footer>
+
+</body>
+</html>
