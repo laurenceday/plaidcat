@@ -85,8 +85,9 @@
     the first-page cursor, not the failed page. Store cursors atomically
     with the rows they produced.</p></div>
     <div class="card"><h3>The polling trap</h3><p class="small">
-    <code>/accounts/balance/get</code> is limited to five calls a minute per
-    Item and bills per call. Read cached balances from
+    <code>/accounts/balance/get</code> is limited to five calls a minute and
+    30 an hour per Item and bills per call; <code>/transactions/refresh</code>
+    runs 2 a minute and 2,880 a day per Item. Read cached balances from
     <code>/accounts/get</code>; force real-time pulls only at decision
     moments.</p></div>
   </div>

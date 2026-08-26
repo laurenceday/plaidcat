@@ -105,7 +105,7 @@
       <tr><td>Bank of America small business</td><td class="y">Yes</td><td>OAuth, but only the primary account holder's username can link; sub-users see no eligible accounts. Items expire after 12 months. <span class="badge official">official</span></td></tr>
       <tr><td>Wells Fargo business online</td><td class="y">Yes</td><td>OAuth via WF Data Exchange. <span class="badge official">official</span></td></tr>
       <tr><td>CitiBusiness Online</td><td class="m">Flaky</td><td>Separate institution entry, chronically broken in operator reports; Finicity historically steadier here. <span class="badge reported">operator-reported</span></td></tr>
-      <tr><td>PNC business online</td><td class="y">Yes</td><td>Since the Sep 2024 agreement, riding Akoya's API; 12-month consent windows on Items with Auth (post-Oct-2024). <span class="badge official">official</span></td></tr>
+      <tr><td>PNC business online</td><td class="y">Yes</td><td>Since the Sep 2024 agreement, riding Akoya's API; on Plaid's 12-month OAuth consent-refresh list. <span class="badge official">official</span></td></tr>
       <tr><td>US Bank business online</td><td class="y">Yes</td><td>OAuth institution; SinglePoint treasury is not covered. <span class="badge official">official</span></td></tr>
       <tr><td>Mercury / Brex / Relay / Bluevine</td><td class="y">Yes</td><td>Mercury is a first-class Plaid institution <span class="badge official">official</span>; Brex connects per third-party listings <span class="badge reported">operator-reported</span> and is now Capital One-owned (closed Apr 2026) <span class="badge official">official</span>, so expect estate migration; Relay and Bluevine per their own docs.</td></tr>
       <tr><td>SVB (First Citizens)</td><td class="y">Yes</td><td>Formal Plaid partnership. <span class="badge official">official</span></td></tr>
@@ -143,8 +143,9 @@
     Business. The borrower picks the wrong entry and the login fails or the
     wrong accounts appear.</p></div>
     <div class="card"><h3>Consent decay and login churn</h3><p class="small">
-    12-month consent windows at BofA, PNC and Capital One; password resets
-    and security interstitials elsewhere. Items die on schedule and by
+    OAuth consent-refresh timers at eleven US institutions (mostly 12
+    months; Brex every 3); password resets and security interstitials
+    elsewhere. Items die on schedule and by
     accident; a dead Item during a drawdown is a monitoring outage. Watch the
     warning webhooks and drive re-auth 30 days early.</p></div>
     <div class="card"><h3>Partial account selection</h3><p class="small">OAuth

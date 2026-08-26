@@ -131,7 +131,7 @@
       <tr><td>13</td><td>P → S</td><td><code>SYNC_UPDATES_AVAILABLE</code> webhook, first with <code>initial_update_complete</code>, later with <code>historical_update_complete</code>. The backend verifies the ES256 JWT on every delivery before trusting it.</td></tr>
       <tr><td>14</td><td>S → P</td><td>On each webhook, loops <code>/transactions/sync</code> with the stored cursor until <code>has_more</code> is false. Upserts added and modified rows, tombstones removed ones, saves the cursor atomically. Data has landed.</td></tr>
       <tr><td>15</td><td>steady state</td><td>Plaid re-polls the bank one to four times a day. Each change fires the webhook and step 14 repeats. Before a credit decision, an on-demand <code>/transactions/refresh</code> (paid add-on) forces a fresh pull.</td></tr>
-      <tr><td>16</td><td>exceptions</td><td><code>ITEM_LOGIN_REQUIRED</code> or a pending-disconnect warning sends the borrower through update mode; same tokens continue afterward. Revocation webhooks halt use. Offboarding calls <code>/item/products/terminate</code>, which also stops billing.</td></tr>
+      <tr><td>16</td><td>exceptions</td><td><code>ITEM_LOGIN_REQUIRED</code> or a pending-disconnect warning sends the borrower through update mode; same tokens continue afterward. Revocation webhooks halt use. Offboarding calls <code>/item/remove</code> (the docs-recommended call; the API spec also carries <code>/item/products/terminate</code>), which also stops billing.</td></tr>
     </table>
   </div>
 
@@ -144,7 +144,9 @@
       created through Link. It groups one or more accounts and carries the
       product set, the user's consent scope, the webhook URL, health state,
       and billing. Linking the same credentials twice makes two independent
-      Items, except at Chase, which silently de-duplicates.
+      Items, except where banks de-duplicate: Chase and PNC invalidate the
+      older Item when the account sets differ, and Schwab allows only one
+      active Item per user per app.
       <span class="badge official">official</span></p>
     </div>
     <div class="card">
@@ -219,11 +221,16 @@
     Wildcat gets an audit trail for free.</li>
     <li><strong>Expiration reality, August 2026.</strong> There is no
     universal US consent expiration. The often-repeated "90-day rule" is a
-    UK/EU artifact. Specific US institutions impose roughly 12-month windows
-    through their data-access agreements: Bank of America, PNC, and Capital
-    One are confirmed examples. Plaid's machinery for a 12-month
-    reauthorization regime is built and explicitly dormant, waiting on the
-    1033 rulemaking. <span class="badge official">official</span></li>
+    UK/EU artifact (Europe runs about 180 days). Eleven US institutions
+    require periodic OAuth consent refresh per Plaid's docs, every 12 months
+    unless noted: American Express, Bank of America (new API only, with
+    old-API Items force-disconnected mid-March through late October 2026),
+    Brex (every 3 months), Capital One, Charles Schwab, Citibank, Fidelity,
+    Navy Federal, PNC, TD Bank, and USAA (18 months). Plaid's machinery for
+    a 12-month reauthorization regime is built and explicitly dormant,
+    waiting on the 1033 rulemaking; a successful update-mode pass resets an
+    Item's consent clock as though newly created.
+    <span class="badge official">official</span></li>
   </ul>
 
   <h2 id="revocation">4 · Revocation from three sides</h2>
@@ -233,7 +240,7 @@
       <tr><th>Who</th><th>How</th><th>Effect</th><th>Signal to Wildcat</th></tr>
       <tr>
         <td>Wildcat</td>
-        <td><code>/item/remove</code> or the newer <code>/item/products/terminate</code></td>
+        <td><code>/item/remove</code>, the docs-recommended offboarding call; the API spec also carries a newer <code>/item/products/terminate</code></td>
         <td>Access token and derived processor tokens die immediately; subscription billing ends. Existing Asset Reports survive.</td>
         <td class="y">Deterministic, it made the call</td>
       </tr>
@@ -269,8 +276,14 @@
     Delivery retries for 24 hours with four-fold backoff from 30 seconds and
     a 10-second response timeout. Every delivery carries a
     <code>Plaid-Verification</code> header holding an ES256 JWT; verify it
-    against <code>/webhook_verification_key/get</code> and compare the body
-    hash before trusting anything. <span class="badge official">official</span>
+    against <code>/webhook_verification_key/get</code>, check the token is
+    under five minutes old, and compare the body hash before trusting
+    anything. Deliveries come only from four published IPs (52.21.26.131,
+    52.21.47.157, 52.41.247.19, 52.88.82.239, subject to change). One more
+    revocation nuance from the docs: bank-side consent revocation surfaces
+    as <code>ITEM_LOGIN_REQUIRED</code> after roughly 24 to 48 hours, and a
+    single-account revocation fires no webhook at all.
+    <span class="badge official">official</span>
   </p>
 
   <div class="grid cols-2">
@@ -323,8 +336,10 @@
     <li>Full production: dashboard application, use-case review by Plaid's
     Customer Oversight team, billing setup, and about a week of processing.
     OAuth registration then runs per institution; Schwab can add six weeks,
-    and PNC gates on the security questionnaire.
-    <span class="badge official">official</span></li>
+    and both Chase and PNC gate on the security questionnaire (waived on
+    Trial plans) <span class="badge official">official</span>. The
+    one-week processing figure is support-site lore; the docs carry no
+    number <span class="badge reported">operator-reported</span>.</li>
     <li>The questionnaire's contents are public: encryption at rest and in
     transit, access reviews, MFA, penetration tests, background checks,
     incident response <span class="badge official">official</span>. Reading
@@ -340,7 +355,7 @@
     <div class="card"><h3>Can access be revoked?</h3><p class="small">By all three parties: Wildcat by API call, the borrower through Plaid Portal or their bank, the bank by killing the OAuth grant. Revocation stops future access only; delivered data stays delivered.</p></div>
     <div class="card"><h3>How long does the credential survive?</h3><p class="small">Indefinitely by design. Nothing about the token needs refreshing. What decays is bank-side consent at specific institutions, and credentials when borrowers change passwords.</p></div>
     <div class="card"><h3>What happens on credential expiry?</h3><p class="small">The Item enters <code>ITEM_LOGIN_REQUIRED</code>, a webhook says so, and update mode fixes it with the same token and unbroken history. Warnings arrive 7 days early where the break is scheduled.</p></div>
-    <div class="card"><h3>Can Wildcat terminate?</h3><p class="small">Yes, and it must for billing hygiene: errored Items keep billing until removed. <code>/item/products/terminate</code> is the recommended offboarding call.</p></div>
+    <div class="card"><h3>Can Wildcat terminate?</h3><p class="small">Yes, and it must for billing hygiene: errored Items keep billing until removed. <code>/item/remove</code> is the docs-recommended offboarding call; the API spec also carries <code>/item/products/terminate</code>.</p></div>
     <div class="card"><h3>Does the connection stay live?</h3><p class="small">It persists until someone kills it, refreshed one to four times a day, with a paid on-demand refresh for decision moments. Real-time it is not.</p></div>
   </div>
 
