@@ -1,128 +1,69 @@
-# Imagegen prompt catalog
+# Generated mascot artwork
 
-Site artwork today is a mix: a hand-built SVG mascot mark, inline SVG
-diagrams, and reference images from the mascot-imagegen-kit committed under
-`assets/mascot/`. Each entry below records the exact prompt to
-regenerate that slot with a full image model (Codex imagegen), following the
-Wildcat brand guidelines and the mascot reference images in the
-`mascot-imagegen-kit` repository's `./assets` directory. After generation,
-drop the file over the named path, keep the stated dimensions, and leave the
-copy areas quiet: headlines and the Wildcat logo are applied in HTML, not
-baked into the image.
+The files under `assets/generated/` are new site artwork. The private
+[`wildcat-finance/mascot-imagegen-kit`](https://github.com/wildcat-finance/mascot-imagegen-kit)
+was used only as an identity reference. None of its source images are committed
+to or displayed by this site.
 
-Shared negative prompt for every slot:
+Generation used Codex's built-in imagegen tool on 2026-08-26. The reference
+checkout was at `a17e0c1`; the four inputs were `refimg_003.png`,
+`refimg_006.png`, `refimg_007.png`, and `refimg_012.png`. Their roles were,
+respectively: full-body proportions, canonical head and expression, full-body
+rendering, and desk-scene gesture. Every prompt told the model to ignore and
+not reproduce captions, text, backgrounds, interfaces, memes, logos, costumes,
+props, and narrative from the source files.
 
-> Generic crypto aesthetic, Bitcoin or Ethereum coins, token stacks, chains,
-> blockchain cubes, hexagon networks, circuitry, cyberpunk city, hacker
-> imagery, holograms, excessive neon, rainbow gradients, lens flares, glossy
-> glassmorphism, chrome 3D objects, generic cats, foxes, cute furry mascots,
-> human faces with cat ears, stock-photo executives, crowded dashboards,
-> illegible UI, generated words, fake logos, captions, or watermarks.
+## Shared identity and visual constraints
 
----
+- One Wildcat mascot: faceted light-grey/white angular head, very tall pointed
+  ears, narrow yellow eyes, heavy dark brows, lean proportions, and a reserved,
+  intelligent expression.
+- Crisp 2D editorial or graphic-novel rendering with restrained paper texture;
+  modern institutional fintech, technically credible, slightly irreverent.
+- Brand colours: Bunker `#141414`, Black Rock `#30313E`, Ultramarine
+  `#3E68FF`, Purple Heart `#4D26BC`, restrained Coral `#FA6F77`, and yellow
+  only for the eyes.
+- No generated text, letters, numbers, logos, watermarks, bank brands, generic
+  cats, foxes, human-cat hybrids, cute furry rendering, glossy 3D, crypto coins,
+  token stacks, chains, cubes, circuitry, cyberpunk scenes, crowded dashboards,
+  or excessive neon.
 
-## 1. Site hero background
+## `hero-data-steward.webp`
 
-- Path: `assets/hero-bg.jpg` (referenced from `index.html` header)
-- Dimensions: 2400x1350 (16:9), displayed cropped to roughly 21:9
-- Current placeholder: CSS gradient (no file)
+> Create a vertical 4:5 homepage hero illustration of the Wildcat mascot as a
+> careful data steward. Seat the mascot at a compact analyst's desk, studying
+> one plain unbranded bank statement. One paw rests on the paper; the other
+> guides a slim cobalt data ribbon into an orderly archive tray. Keep the full
+> ears, paws, desk, chair, paper, ribbon, tray, legs, and shoes visible in a
+> compact silhouette that reads at 240px. Use simple dark clothing and a calm,
+> sceptical, competent expression. Render on a uniform edge-to-edge Bunker
+> `#141414` field with no panel, room, horizon, texture, or written text.
 
-> Create a 16:9 hero background for Wildcat Protocol. Show an abstract
-> representation of on-chain credit infrastructure through a subtle receding
-> grid and a small number of precise interconnected lines. Dark near-black
-> `#141414` and plum edges transition into concentrated ultramarine `#3E68FF`
-> and Purple Heart `#4D26BC`, with a restrained red-coral `#FA6F77` glow on
-> one side. Sophisticated institutional-finance atmosphere, secure and
-> technically credible, soft depth, controlled contrast, and minimal detail.
-> Leave the left-center area quiet for a large white headline. No mascot,
-> text, logo, coins, chains, cubes, circuitry, or cyberpunk imagery.
+The first generation asked for real transparency. Two alpha checks found the
+export was opaque, so the final targeted edit deliberately replaced the false
+checkerboard with the Bunker field used by the site hero.
 
-## 2. Mascot-led hero (index page, right third)
+## `data-layer.webp`
 
-- Path: `assets/hero-mascot.png` (transparent or dark background)
-- Dimensions: 1600x900 (16:9)
-- Current placeholder: `assets/mascot.svg` (hand-built SVG head)
+> Create a wide 3:2 editorial illustration of the Wildcat mascot maintaining a
+> precise data pipeline. An unruly ribbon of bank-record marks enters from the
+> left, passes through three clean transparent archival trays, and emerges as
+> a small orderly set of sealed metric cards. A second thin coral timeline of
+> onchain outcome marks joins only at the final tray. Show one full mascot on
+> the right half carefully aligning the middle tray. Use a warm-white field,
+> sparse near-black linework, fine technical guides, clean margins, generous
+> negative space, and no labels or interface text.
 
-> Create a 16:9 Wildcat Protocol hero image featuring the Wildcat mascot. Use
-> the images in `./assets` as visual references and preserve the same
-> character identity: angular paper-fold head, tall pointed ears, narrow
-> yellow eyes, light grey-white colouring, lean proportions, and a restrained,
-> intelligent, slightly sceptical expression.
->
-> Show the mascot seated at a plain desk, studying a single printed bank
-> statement under a desk lamp, one paw resting on the page. Place the
-> character on the right third of the composition, leaving a large quiet area
-> on the left for a headline. Use a dark plum-to-purple background with
-> restrained ultramarine and red-coral light, a subtle perspective grid, and
-> minimal financial-network details. Modern institutional DeFi aesthetic,
-> technically credible and slightly irreverent.
->
-> Ignore captions, text, interfaces, and backgrounds from the reference
-> images. Do not redesign the mascot. No generated text, logo, coins,
-> blockchain cubes, cyberpunk effects, or glossy cartoon rendering.
+## `outcomes-ledger.webp`
 
-## 3. Section spot illustrations (one per explainer page)
+> Create a wide 3:2 editorial illustration showing that longitudinal history
+> joined to outcomes, not raw data, is the defensible asset. A long paper-and-
+> light archive ribbon passes through a clear two-year window and continues
+> into the distance. Sparse blue cash-flow marks join a restrained coral
+> sequence of outcome markers and become compact evidence cards. Put one
+> Wildcat mascot on the right third, attaching the final marker with deliberate
+> care. Use a deep Bunker-to-plum field with restrained ultramarine light. Do
+> not use a literal moat, castle, treasure, lock, pile of data, or written text.
 
-- Paths: `assets/spot-technical.png`, `assets/spot-products.png`,
-  `assets/spot-coverage.png`, `assets/spot-legal.png`,
-  `assets/spot-commercial.png`, `assets/spot-architecture.png`,
-  `assets/spot-moat.png`
-- Dimensions: 800x800 each, warm-white background
-- Current placeholder: `assets/mascot.svg` reused at small scale
-
-Use the mascot illustration scaffold once per page, varying the scenario:
-
-> Create an illustration of the Wildcat mascot explaining [SCENARIO]. Use the
-> images in `./assets` as visual references and preserve the established
-> facial structure, ears, eyes, proportions, and overall identity.
->
-> Render the character as sparse monochrome editorial line art with thin
-> near-black outlines and economical construction. The expression should feel
-> intelligent, dry, and slightly mischievous rather than cute or childish.
-> Place the character on a warm-white or very light-grey background with
-> ample negative space. Use one restrained blue or pale-purple technical
-> accent if needed.
->
-> Ignore captions, backgrounds, clothing, and other characters in the
-> reference images unless explicitly requested. No photorealism, fur texture,
-> glossy 3D rendering, text, or logo.
-
-Scenarios per file:
-
-| File | [SCENARIO] |
-| --- | --- |
-| spot-technical.png | tracing a single wire from a bank vault door to a small labelled server rack, holding a magnifying glass over the connector |
-| spot-products.png | weighing three folders of different thickness on a balance scale |
-| spot-coverage.png | standing at a wall map of banks, placing pins, with a few unreachable banks behind a velvet rope |
-| spot-legal.png | reading a very long contract scroll that spills off the desk, one eyebrow raised |
-| spot-commercial.png | sliding a coin across a counter toward a teller window |
-| spot-architecture.png | stacking three labelled glass shelves: raw, normalized, derived |
-| spot-moat.png | leaning on a shovel beside a half-dug moat around a small data castle |
-
-## 4. Data-pipeline diagram backdrop (architecture page)
-
-- Path: `assets/diagram-bg.png`
-- Dimensions: 2000x800
-- Current placeholder: inline SVG diagram (keep the SVG labels; this is an
-  optional atmospheric underlay)
-
-> Create a minimal conceptual diagram backdrop showing staged data flowing
-> left to right through four quiet zones. Use faint overlapping blue and
-> purple orbital lines, thin near-black guides, white or off-white background,
-> precise fintech interface aesthetic, sparse composition, substantial
-> negative space. No mascot, labels, numbers, logos, blockchain icons, coins,
-> or decorative complexity.
-
-## 5. PDF cover art
-
-- Path: `assets/pdf-cover.png`
-- Dimensions: 1700x2200 (portrait US Letter)
-- Current placeholder: flat brand-color cover drawn in code
-
-> Create a portrait cover background for a Wildcat Protocol research report.
-> Dark near-black field with an atmospheric plum-to-ultramarine gradient
-> concentrated in the lower third, one restrained coral accent line, and a
-> subtle perspective grid fading toward the top. Leave the upper half
-> visually quiet for the report title and the Wildcat logo. Modern
-> institutional DeFi aesthetic, secure, minimal. No text, mascot, coins, or
-> decorative clutter.
+The checked-in WebP files preserve the generated dimensions: the hero is
+1127×1396; both landscape illustrations are 1536×1024.

@@ -31,13 +31,18 @@ server. Every page prints cleanly to PDF.
 
 ## Repository layout
 
-- `assets/`: stylesheet, mascot SVG and kit art, logos, `imagegen-prompts.md` (exact
-  prompts to regenerate all art with a full image model)
+- `assets/`: stylesheet, official logos and three generated site illustrations;
+  `imagegen-prompts.md` records their source references and generation briefs
 - `pdf/`: production spec stubs for designed PDFs (content sourced from the
   site pages; art from the imagegen catalog)
 - `research/`: the six raw Surveyor research streams with per-claim sources
   and confidence labels
 - `study/`: the Fiat study, runbook and link-check artifacts
+
+The private `wildcat-finance/mascot-imagegen-kit` is a generation reference,
+not a site asset library. Its source images are not committed here or displayed
+wholesale. Only new illustrations generated from a small identity-reference set
+belong in `assets/generated/`.
 
 ## Method and trust labels
 
