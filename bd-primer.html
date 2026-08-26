@@ -107,7 +107,7 @@
       <tr><td>Borrower: "Our treasury team can't hand out the owner login."</td><td>Correct, and the onboarding runbook handles it: the credential owner runs Link once, OAuth keeps the bank's own MFA, and no credentials ever touch Wildcat or Plaid on the OAuth path.</td></tr>
       <tr><td>Lender: "Why trust Wildcat's numbers?"</td><td>Signed bundles, published formulas, coverage and freshness embedded, an upgrade path to enclave-signed computation, and attestations consumable straight from hooks. And the honest limit stated: bank data does not see exchange exposure, so trading-firm monitoring pairs with exchange attestations.</td></tr>
       <tr><td>Partner: "We want to hold the data ourselves."</td><td>No. Partners compute against Wildcat's perimeter as service providers. That boundary is what makes the borrower consent and the Plaid contract work at all.</td></tr>
-      <tr><td>Anyone: "Didn't Maple/Goldfinch prove this fails?"</td><td>They proved self-reported documents fail. Continuous pull-based feeds with completeness checks are the fix, and the one live protocol running this exact pattern (3Jane) is growing. The <a href="moat.html">moat page</a> has the mortality table.</td></tr>
+      <tr><td>Anyone: "Didn't Maple/Goldfinch prove this fails?"</td><td>They proved self-reported documents fail. Continuous pull-based feeds with completeness checks are the fix, and one protocol (3Jane) runs this exact pattern live today. The <a href="moat.html">moat page</a> has the mortality table.</td></tr>
     </table>
   </div>
 

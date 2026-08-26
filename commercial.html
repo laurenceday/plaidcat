@@ -64,7 +64,7 @@
     <li><strong>Three billing models.</strong> One-time per Item (Auth about
     $1.00 to $1.25, Identity about $1.10), subscription per Item per month
     (Transactions about $0.25 to $0.30 reported), and per-request or flexible
-    (Balance about $0.05, Asset Reports about $3 to $5, Statements scaled by
+    (Balance about $0.05 to $0.15 per call, Asset Reports about $3 to $5, Statements scaled by
     statement count). <span class="badge reported">operator-reported</span></li>
     <li><strong>The 2-year backfill is cheap.</strong> History past 61 days
     costs one flat Additional History fee per Item, whatever the depth.
@@ -85,7 +85,9 @@
     Assumptions: two Items per borrower; onboarding pulls identity and a
     730-day history; monitoring runs the transactions subscription with two
     on-demand refreshes per Item per month; one asset report per borrower per
-    quarter; statements monthly where supported (about 60% of institutions).
+    quarter; statements monthly where supported (a model assumption of about 60% of
+    institutions; the products page carries the ~40%-of-depository-accounts
+    coverage figure).
     Estimated line items use the operator-reported price points above; the
     full arithmetic is in stream E. Per borrower this lands near $58 in year
     one. <span class="badge inferred">estimate</span>
@@ -114,14 +116,16 @@
     <li><strong>Process.</strong> Dashboard application, use-case review by
     Plaid's Customer Oversight team, billing setup, about a week, then
     per-institution OAuth registration; the security questionnaire gates
-    certain banks and is effectively SOC 2-shaped.
-    <span class="badge official">official</span></li>
+    certain banks <span class="badge official">official</span> and is
+    effectively SOC 2-shaped <span class="badge inferred">inferred</span>.</li>
     <li><strong>Crypto is not a policy bar.</strong> Plaid names Coinbase and
     Gemini as customers, runs a dedicated crypto use-case page, and added
-    read-only exchange data in 2022. No prohibited-industries bar touches
-    the data products; only the Transfer payments product carries one. No
-    rejection reports of crypto firms surfaced.
-    <span class="badge official">official</span></li>
+    read-only exchange data in 2022 <span class="badge official">official</span>.
+    No prohibited-industries bar was found on the data products, a searched
+    absence rather than a verified negative
+    <span class="badge inferred">inferred</span>; the Transfer payments
+    product does carry one <span class="badge official">official</span>. No
+    rejection reports of crypto firms surfaced.</li>
     <li><strong>The residual risk is contractual.</strong> The MSA permits
     immediate suspension for legal violations or reputational harm, and the
     Developer Policy reserves broad termination rights. A DeFi credit
@@ -138,8 +142,9 @@
     <div class="card"><h3>Renewal mechanics</h3><p class="small">Twelve-month
     initial term, auto-renewing yearly; non-renewal needs 60 days' notice;
     Plaid may raise any rate at renewal on 30 days' notice; operators report
-    5-10% annual escalators. Calendar the notice window.
-    <span class="badge official">official</span></p></div>
+    5-10% annual escalators <span class="badge reported">operator-reported</span>.
+    Calendar the notice window.
+    <span class="badge official">official</span> on the MSA terms.</p></div>
     <div class="card"><h3>No SLA</h3><p class="small">The standard MSA
     carries no uptime commitment and none is published anywhere. For a
     protocol whose covenants depend on monitoring feeds, this is the real
@@ -161,9 +166,9 @@
   <p>
     On the bank-fee overhang: JPMorgan's per-pull fees are live and Plaid
     signed, saying publicly that customer contracts and pricing are unchanged
-    at this time. No premium-institution surcharge exists as of August 2026.
-    The pass-through vehicle, if it comes, is the renewal-rate clause.
-    <span class="badge official">official</span>
+    at this time. No premium-institution surcharge has been found as of August 2026;
+    absence of evidence, not proof. The pass-through vehicle, if it comes,
+    is the renewal-rate clause. <span class="badge inferred">inferred</span>
   </p>
 
   <h2 id="risks">5 · Three commercial risks</h2>

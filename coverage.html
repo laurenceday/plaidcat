@@ -80,7 +80,7 @@
         <text x="230" y="145" text-anchor="middle" font-size="12">Wells business online · US Bank · PNC (via Akoya)</text>
         <text x="230" y="165" text-anchor="middle" font-size="12">Mercury · Brex · Relay · Bluevine · SVB</text>
         <text x="230" y="185" text-anchor="middle" font-size="12">Cross River business · regionals · CUs</text>
-        <text x="230" y="225" text-anchor="middle" font-size="11" fill="#157A47">OAuth handles even hardware-token MFA</text>
+        <text x="230" y="225" text-anchor="middle" font-size="11" fill="#157A47">OAuth hands MFA to the bank's own login page</text>
 
         <rect x="500" y="40" width="380" height="220" rx="14" fill="#FDF0F0" stroke="#C24647" stroke-width="1.5"/>
         <text x="690" y="70" text-anchor="middle" font-weight="bold" font-size="15">Treasury portals</text>
@@ -105,9 +105,9 @@
       <tr><td>Bank of America small business</td><td class="y">Yes</td><td>OAuth, but only the primary account holder's username can link; sub-users see no eligible accounts. Items expire after 12 months. <span class="badge official">official</span></td></tr>
       <tr><td>Wells Fargo business online</td><td class="y">Yes</td><td>OAuth via WF Data Exchange. <span class="badge official">official</span></td></tr>
       <tr><td>CitiBusiness Online</td><td class="m">Flaky</td><td>Separate institution entry, chronically broken in operator reports; Finicity historically steadier here. <span class="badge reported">operator-reported</span></td></tr>
-      <tr><td>PNC business online</td><td class="y">Yes</td><td>Since the Sep 2024 agreement, riding Akoya's API; 12-month consent windows. <span class="badge official">official</span></td></tr>
+      <tr><td>PNC business online</td><td class="y">Yes</td><td>Since the Sep 2024 agreement, riding Akoya's API; 12-month consent windows on Items with Auth (post-Oct-2024). <span class="badge official">official</span></td></tr>
       <tr><td>US Bank business online</td><td class="y">Yes</td><td>OAuth institution; SinglePoint treasury is not covered. <span class="badge official">official</span></td></tr>
-      <tr><td>Mercury / Brex / Relay / Bluevine</td><td class="y">Yes</td><td>First-class Plaid institutions. Brex is now Capital One-owned (closed Apr 2026); expect estate migration over time. <span class="badge official">official</span></td></tr>
+      <tr><td>Mercury / Brex / Relay / Bluevine</td><td class="y">Yes</td><td>Mercury is a first-class Plaid institution <span class="badge official">official</span>; Brex connects per third-party listings <span class="badge reported">operator-reported</span> and is now Capital One-owned (closed Apr 2026) <span class="badge official">official</span>, so expect estate migration; Relay and Bluevine per their own docs.</td></tr>
       <tr><td>SVB (First Citizens)</td><td class="y">Yes</td><td>Formal Plaid partnership. <span class="badge official">official</span></td></tr>
       <tr><td>Cross River Bank</td><td class="y">Yes</td><td>Two separate institutions: Personal, and Branch Banking Business. <span class="badge official">official</span></td></tr>
       <tr><td>Treasury portals (all)</td><td class="n">No</td><td>No aggregator path found anywhere. <span class="badge inferred">inferred</span></td></tr>
@@ -133,8 +133,9 @@
     banks at JPM or BofA commercial, so the institution is literally absent
     from Link's search. Nothing to debug; the account is out of scope.</p></div>
     <div class="card"><h3>Entitlement lockout</h3><p class="small">The CFO or
-    bookkeeper connects fine to the bank and sees zero linkable accounts,
-    because only the primary owner's login can share business accounts. The
+    bookkeeper connects fine to the bank and sees zero linkable accounts:
+    at BofA, documented policy says only the primary owner's login can share
+    business accounts, and operators report the pattern elsewhere. The
     treasury team almost never holds that credential. Onboarding must name
     the right human.</p></div>
     <div class="card"><h3>Separate-institution confusion</h3><p class="small">

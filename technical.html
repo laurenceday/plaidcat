@@ -119,7 +119,7 @@
       <tr><td>1</td><td>B → F</td><td>Clicks "Connect Operating Accounts."</td></tr>
       <tr><td>2</td><td>F → S</td><td>Authenticated request for a link token.</td></tr>
       <tr><td>3</td><td>S → P</td><td><code>/link/token/create</code> with <code>products: ["transactions"]</code>, <code>transactions.days_requested: 730</code>, <code>additional_consented_products</code> for later products, a webhook URL, account filters for business checking and savings, and an internal borrower id. The 730 is a one-shot: it cannot be raised later without deleting and re-linking the Item.</td></tr>
-      <tr><td>4</td><td>P → F</td><td>Returns a <code>link_token</code>, valid four hours.</td></tr>
+      <tr><td>4</td><td>P → S → F</td><td>Returns a <code>link_token</code>, valid four hours; the backend forwards it to the frontend.</td></tr>
       <tr><td>5</td><td>F</td><td>Opens Plaid Link with it.</td></tr>
       <tr><td>6</td><td>B in Link</td><td>Sees the consent pane: Wildcat's name, Plaid's role and privacy policy, and under Data Transparency Messaging the exact data types and use cases requested. Accepts, then picks the institution.</td></tr>
       <tr><td>7</td><td>B at K</td><td>OAuth path (the US majors): redirected to the bank's own site or app, logs in there, picks which accounts to share on the bank's screen, approves. Credentials never touch Plaid. Legacy path (long tail): enters bank credentials inside Link, answers MFA there.</td></tr>
@@ -325,10 +325,12 @@
     OAuth registration then runs per institution; Schwab can add six weeks,
     and PNC gates on the security questionnaire.
     <span class="badge official">official</span></li>
-    <li>The security questionnaire is effectively SOC 2-shaped: encryption at
-    rest and in transit, access reviews, MFA, penetration tests, background
-    checks, incident response. A team without those controls will struggle.
-    <span class="badge reported">operator-reported</span></li>
+    <li>The questionnaire's contents are public: encryption at rest and in
+    transit, access reviews, MFA, penetration tests, background checks,
+    incident response <span class="badge official">official</span>. Reading
+    it as effectively SOC 2-shaped, such that a team without those controls
+    will struggle, is this run's inference
+    <span class="badge inferred">inferred</span>.</li>
   </ul>
 
   <h2 id="questions">8 · The brief's questions, answered</h2>
