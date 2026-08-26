@@ -48,7 +48,10 @@
     <li>Written use-case approval that names, in words: retention of pulled
     data, internal derivation of credit metrics, analytics access by
     service providers, and distribution of derived, entity-level metrics to
-    lenders (and publicly, if that is ever wanted).</li>
+    lenders (and publicly, if that is ever wanted). Name Assets as the
+    underwriting artifact and Transactions as the monitoring feed: the
+    Financial Insights docs bar Transactions from "credit or underwriting
+    decisioning", and pre-agreeing the framing defuses that clause.</li>
     <li>A customer-side derived-data and de-identified-data clause. Plaid's
     standard paper grants that right to Plaid alone, in its sole discretion,
     and grants the customer nothing symmetric. This is the negotiation's
@@ -116,6 +119,7 @@
       <tr><td>New York Financial Data Rights Act (proposed)</td><td>Would cover small-business data with per-violation penalties: the first statute that would actually touch this model.</td></tr>
       <tr><td>Bank data-access agreements</td><td>No statute obliges banks to serve business-account data; JPMorgan's paid regime is live and spreading. Supply continuity is the long-run threat.</td></tr>
       <tr><td>Plaid's hidden cash-flow report product</td><td>If it ships, its terms may package exactly what Wildcat assembles by hand, with different data-rights language.</td></tr>
+      <tr><td>LEI requirement</td><td>Plaid requests a Legal Entity Identifier from OAuth-connecting customers under the 1033 rule; enforcement is paused pending the rewrite, but obtaining one early is cheap.</td></tr>
       <tr><td>Item revocation asymmetries</td><td>Bank-side revocation may never signal; removal may leave stale bank-side grants. The borrower offboarding runbook should cover both ends.</td></tr>
     </table>
   </div>

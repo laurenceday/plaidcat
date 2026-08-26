@@ -44,8 +44,13 @@ server. Every page prints cleanly to PDF.
 Claims across the site carry confidence labels: OFFICIAL (Plaid docs, bank
 pages, regulators), OPERATOR-REPORTED (forums, customer help centers,
 procurement intel), INFERRED (triangulated), UNVERIFIED (best understanding,
-check before relying). plaid.com blocked direct fetches from the research
-environment, so official Plaid claims were drawn from search-index extracts
-of plaid.com URLs plus Plaid's published OpenAPI specification, and
-cross-checked against operator sources. Spot-verify decisive claims
-before contractual reliance. Research is current as of 2026-08-26.
+check before relying). plaid.com blocked direct fetches during the
+original research, so official Plaid claims were first drawn from
+search-index extracts plus Plaid's published OpenAPI specification. A
+local mirror of plaid.com/docs (mid-2026 vintage, operator-supplied) was
+then used to verify the site: two Warden passes confirmed the great
+majority of claims verbatim, corrected eleven, and answered previously
+unverifiable items (the full consent-refresh institution list, webhook IP
+allowlist, rate limits). The verification records live in `research/` as
+streams G1 and G2. Contract clauses still deserve a live-page check before
+reliance. Research is current as of 2026-08-26.

@@ -173,7 +173,9 @@
     declared affiliate lists, or TTM inflates arbitrarily. Sweep accounts
     excluded from flows but included in balances. Credit-line draws classed
     as financing, never revenue; an interest payment with no declared
-    facility is a red flag. Exchange transfers get their own class: for
+    facility is a red flag, and the declared-debt schedule stays
+    borrower-attested because Plaid Liabilities covers only cards, student
+    loans and mortgages, never business facilities. Exchange transfers get their own class: for
     trading firms, bank-rail "revenue" is meaningless, so ship a
     liquidity-and-flow bundle instead of pretending. Refunds net against
     revenue; tax flows class separately.</p>
@@ -299,9 +301,8 @@
     consenting friendly borrower.</li>
     <li>Link flow with <code>transactions</code> product,
     <code>days_requested: 730</code>, raw descriptors on,
-    <code>additional_consented_products: ["assets"]</code>... note Assets
-    actually requires Link-time initialization, so put it in the products
-    array from the start.</li>
+    <code>assets</code> in the products array from the start (cleanest),
+    or added later through the documented update-mode consent step.</li>
     <li>Ingestion service: exchange, store tokens vaulted, first
     <code>/transactions/sync</code>, webhook receiver with JWT verification,
     cursor journal to append-only storage.</li>

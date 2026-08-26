@@ -75,8 +75,15 @@
     Items multiply the fee. Re-links can re-trigger one-time fees.
     <span class="badge official">official</span></li>
     <li><strong>Rate limits are irrelevant at Wildcat scale,</strong> except
-    the five-per-minute per-Item balance check, which only bites naive
-    polling. <span class="badge official">official</span></li>
+    the per-Item balance check (5 a minute, 30 an hour) and on-demand
+    refresh (2 a minute per Item), which only bite naive polling.
+    <span class="badge official">official</span></li>
+    <li><strong>Plan sizing is now published.</strong> Growth suits API
+    volumes up to about $6,000 a month and Custom sits above that; EU/UK
+    customers get Custom only, and Check products never ride
+    pay-as-you-go. Every product the pilot needs (Transactions with
+    refresh, Assets, Statements, Balance, Identity) is included on the free
+    Trial plan. <span class="badge official">official</span></li>
   </ul>
 
   <h2 id="model">2 · The Wildcat cost model</h2>

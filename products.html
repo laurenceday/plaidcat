@@ -66,9 +66,12 @@
     <li><strong>Lookback.</strong> <code>days_requested</code> runs 1 to 730,
     default 90, set once at Link and immutable afterward. Getting this wrong
     means deleting the Item and asking the borrower to re-link. The 730 is a
-    request ceiling, not a promise: Capital One serves 90 days, Bank of
-    America 18 months on checking. Real two-year depth accrues by holding the
-    connection and letting the dataset age in.</li>
+    request ceiling, not a promise: Capital One serves 90 days per the docs
+    <span class="badge official">official</span>, and operators report Bank
+    of America around 18 months on checking
+    <span class="badge reported">operator-reported</span>. Real two-year
+    depth accrues by holding the connection and letting the dataset age
+    in.</li>
     <li><strong>Fields.</strong> Amounts (positive means outflow, a
     sign-convention trap), posted and authorized dates, merchant name,
     counterparties with stable entity ids and confidence levels, the
@@ -100,8 +103,10 @@
     cash-flow report, plausibly the business-side counterpart to the consumer
     Check product. If it ships, it could collapse some of the
     assemble-it-yourself work this site describes. Existence verified in the
-    spec; everything else about it is
-    <span class="badge unverified">unverified</span>.</p>
+    spec; a full mid-2026 mirror of plaid.com/docs contains zero references,
+    so it remains undocumented, and the closest documented analog is Check's
+    consumer-side Cash Flow Updates monitoring beta. Everything beyond
+    existence is <span class="badge unverified">unverified</span>.</p>
   </div>
 
   <h2 id="assets">2 · Assets, the artifact</h2>
@@ -112,10 +117,13 @@
     transaction window, and account-owner identity. Generation is
     asynchronous, announced by webhook, and the report renders to a
     bank-formatted PDF. <span class="badge official">official</span></li>
-    <li>Assets must be in the products array at Link; it cannot be added to
-    an existing Item later. Refreshing means buying a new report. History
-    past 61 days adds a flat fee, and each block of five Items in one report
-    multiplies the report fee.</li>
+    <li>Assets is best initialized at Link, and the docs also allow adding
+    it to an existing Item through a short update-mode consent step (users
+    connected under two years ago skip the credentials pane). Refreshing
+    means buying a new report. History past 61 days adds a flat per-Item
+    fee, each block of five Items adds a surcharge, and the PDF and Audit
+    Copy each carry their own per-request fee. Reports have no documented
+    expiry; they persist until removed.</li>
     <li><strong>Sharing is the point.</strong> Audit Copy hands a fixed
     auditor (Fannie Mae, Freddie Mac, Ocrolus) direct access. Relay shares
     the exact report, JSON and PDF and even refresh rights, with any third
@@ -131,7 +139,10 @@
   <p>
     The product is the PDFs: exact bank-branded statements with SHA-256
     hashes, listed and downloaded by API, up to two years requested in one
-    Link session and extendable forward by refresh.
+    Link session and extendable forward by refresh. Like Assets, it can be
+    added to an existing Item through an update-mode consent step, and the
+    docs recommend requesting it as required-if-supported so unsupported
+    institutions do not block Link.
     <span class="badge official">official</span>
   </p>
 
@@ -161,9 +172,11 @@
     risk schemas left the spec. <span class="badge unverified">unverified</span></p></div>
     <div class="card"><h3>Identity</h3><p class="small">Account-holder names,
     emails, phones, addresses; only names are guaranteed. Business-account
-    detection is officially unsupported here, and whether the name returned
-    is the entity or the signer depends on the institution. Plan for
-    reconciliation, not truth. <span class="badge official">official</span></p></div>
+    detection now runs through the beta <code>holder_category</code> field
+    (about 70% populated) plus an undeprecated business-name flag on
+    <code>/identity/match</code>; whether the name returned is the entity or
+    the signer still depends on the institution. Plan for reconciliation,
+    not truth. <span class="badge official">official</span></p></div>
     <div class="card"><h3>Signal</h3><p class="small">Per-payment ACH return
     risk with 80-plus attributes. Repayment-collection tooling, not
     monitoring. Requires its own consent since July 2026.</p></div>
@@ -214,6 +227,21 @@
     business-entity data layer. Institution history caps mean the two-year
     dataset is partly harvested and partly grown: connect early, keep the
     Item alive, and month 25 onward becomes history nobody else can re-pull.</p>
+  </div>
+
+  <div class="callout warn">
+    <span class="label">A docs-level usage restriction to carry into the Plaid negotiation</span>
+    <p>Plaid's Financial Insights docs state that Transactions, Enrich,
+    Liabilities and Investments "may not be used as part of a credit or
+    underwriting decisioning process", and the migration guides steer US
+    consumer underwriting to the FCRA-side Consumer Report. Business-entity
+    credit sits outside that consumer product's scope, and Plaid's own
+    underwriting page recommends Assets exactly for "use cases not supported
+    by Consumer Report". The practical consequence: Wildcat's written
+    use-case approval should name Assets as the underwriting artifact and
+    Transactions as the monitoring feed, in those words, so the
+    decisioning-restriction language never becomes an argument later.
+    <span class="badge official">official</span></p>
   </div>
 
   <figure class="diagram">
