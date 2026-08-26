@@ -203,3 +203,23 @@ cause before the fix.
   `pdf/README.md`.
 - No other decision in this run is expensive to reverse; page copy and
   layout are cheap edits by design.
+
+### Amendment -- 2026-08-26
+
+**What changed.** A complete local mirror of plaid.com/docs (880 files,
+including Plaid's own llms-full.txt dump, changelog entries through June
+2026) arrived from the operator after integration. It becomes the
+authoritative primary source for every Plaid-official claim, replacing the
+search-extract channel. A verification pass now runs over the site: three
+Warden agents check technical, product/billing, and missed-material surfaces
+against the corpus; corrections and badge upgrades land on the pages; a
+research-G stream records the pass; the method caveat on the README, the
+index, and the artifact digest is rewritten to name the corpus.
+**Why.** The original run could not fetch plaid.com directly and said so on
+every surface; the operator supplied the corpus and asked for integration
+under Fiat discipline.
+**Steps touched.** Steps 2 through 6 (page content and method notes only;
+no step's entry or exit contract changes).
+**Still holding.** Step 1: entry holds; exit holds. Step 2: entry holds;
+exit holds. Step 3: entry holds; exit holds. Step 4: entry holds; exit
+holds. Step 5: entry holds; exit holds. Step 6: entry holds; exit holds.
