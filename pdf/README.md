@@ -10,7 +10,7 @@ Typography: Liberation Sans headlines, Inter body. Colors: bunker `#141414`
 text on white; ultramarine `#3E68FF` and Purple Heart `#4D26BC` accents;
 Dull Red `#C24647` reserved for risk callouts.
 
-## PDF 1 — Executive brief (4–6 pages)
+## PDF 1: Executive brief (4 to 6 pages)
 
 - **Source:** `../index.html` (verdict cards) + `../moat.html` (defensibility
   verdict) + the cost table on `../commercial.html`.
@@ -21,7 +21,7 @@ Dull Red `#C24647` reserved for risk callouts.
 - **Art:** cover background (imagegen entry 5), pipeline diagram redrawn from
   `../index.html`'s hero SVG.
 
-## PDF 2 — Full research report (30–50 pages)
+## PDF 2: Full research report (30 to 50 pages)
 
 - **Source:** all seven explainer pages in reading order: technical,
   products, coverage, legal, commercial, architecture, moat.
@@ -31,7 +31,7 @@ Dull Red `#C24647` reserved for risk callouts.
   diagrams, appendix with the full source list from each page's Sources
   block, and the study/runbook from `../study/` as an annex.
 
-## PDF 3 — Borrower-facing one-pager
+## PDF 3: Borrower-facing one-pager
 
 - **Source:** the "what the borrower sees" walkthrough on `../technical.html`
   and the consent/revocation rights summary on `../legal.html`.
@@ -43,7 +43,7 @@ Dull Red `#C24647` reserved for risk callouts.
 - **Tone:** plain-English, no jargon; reuse the exact revocation rights
   wording from `../legal.html` so the promise and the page never diverge.
 
-## PDF 4 — Analytics-partner data-access brief
+## PDF 4: Analytics-partner data-access brief
 
 - **Source:** `../architecture.html` external-analytics layer section +
   `../legal.html` re-sharing pattern section.

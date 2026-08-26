@@ -1,12 +1,13 @@
 # Imagegen prompt catalog
 
-Every piece of artwork on this site is currently a hand-built SVG or a
-compressed raster placeholder. Each entry below records the exact prompt to
+Site artwork today is a mix: a hand-built SVG mascot mark, inline SVG
+diagrams, and reference images from the mascot-imagegen-kit committed under
+`assets/mascot/`. Each entry below records the exact prompt to
 regenerate that slot with a full image model (Codex imagegen), following the
 Wildcat brand guidelines and the mascot reference images in the
 `mascot-imagegen-kit` repository's `./assets` directory. After generation,
 drop the file over the named path, keep the stated dimensions, and leave the
-copy areas quiet — headlines and the Wildcat logo are applied in HTML, not
+copy areas quiet: headlines and the Wildcat logo are applied in HTML, not
 baked into the image.
 
 Shared negative prompt for every slot:
@@ -22,9 +23,9 @@ Shared negative prompt for every slot:
 
 ## 1. Site hero background
 
-- **Path:** `assets/hero-bg.jpg` (referenced from `index.html` header)
-- **Dimensions:** 2400x1350 (16:9), displayed cropped to roughly 21:9
-- **Current placeholder:** CSS gradient (no file)
+- Path: `assets/hero-bg.jpg` (referenced from `index.html` header)
+- Dimensions: 2400x1350 (16:9), displayed cropped to roughly 21:9
+- Current placeholder: CSS gradient (no file)
 
 > Create a 16:9 hero background for Wildcat Protocol. Show an abstract
 > representation of on-chain credit infrastructure through a subtle receding
@@ -38,9 +39,9 @@ Shared negative prompt for every slot:
 
 ## 2. Mascot-led hero (index page, right third)
 
-- **Path:** `assets/hero-mascot.png` (transparent or dark background)
-- **Dimensions:** 1600x900 (16:9)
-- **Current placeholder:** `assets/mascot.svg` (hand-built SVG head)
+- Path: `assets/hero-mascot.png` (transparent or dark background)
+- Dimensions: 1600x900 (16:9)
+- Current placeholder: `assets/mascot.svg` (hand-built SVG head)
 
 > Create a 16:9 Wildcat Protocol hero image featuring the Wildcat mascot. Use
 > the images in `./assets` as visual references and preserve the same
@@ -62,12 +63,12 @@ Shared negative prompt for every slot:
 
 ## 3. Section spot illustrations (one per explainer page)
 
-- **Paths:** `assets/spot-technical.png`, `assets/spot-products.png`,
+- Paths: `assets/spot-technical.png`, `assets/spot-products.png`,
   `assets/spot-coverage.png`, `assets/spot-legal.png`,
   `assets/spot-commercial.png`, `assets/spot-architecture.png`,
   `assets/spot-moat.png`
-- **Dimensions:** 800x800 each, warm-white background
-- **Current placeholder:** `assets/mascot.svg` reused at small scale
+- Dimensions: 800x800 each, warm-white background
+- Current placeholder: `assets/mascot.svg` reused at small scale
 
 Use the mascot illustration scaffold once per page, varying the scenario:
 
@@ -100,9 +101,9 @@ Scenarios per file:
 
 ## 4. Data-pipeline diagram backdrop (architecture page)
 
-- **Path:** `assets/diagram-bg.png`
-- **Dimensions:** 2000x800
-- **Current placeholder:** inline SVG diagram (keep the SVG labels; this is an
+- Path: `assets/diagram-bg.png`
+- Dimensions: 2000x800
+- Current placeholder: inline SVG diagram (keep the SVG labels; this is an
   optional atmospheric underlay)
 
 > Create a minimal conceptual diagram backdrop showing staged data flowing
@@ -114,9 +115,9 @@ Scenarios per file:
 
 ## 5. PDF cover art
 
-- **Path:** `assets/pdf-cover.png`
-- **Dimensions:** 1700x2200 (portrait US Letter)
-- **Current placeholder:** flat brand-color cover drawn in code
+- Path: `assets/pdf-cover.png`
+- Dimensions: 1700x2200 (portrait US Letter)
+- Current placeholder: flat brand-color cover drawn in code
 
 > Create a portrait cover background for a Wildcat Protocol research report.
 > Dark near-black field with an atmospheric plum-to-ultramarine gradient

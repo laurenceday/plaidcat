@@ -203,15 +203,16 @@
     <li><strong>Signed JSON bundle</strong> per borrower per run: metrics,
     window, coverage, staleness, code version, input manifest hash, issue
     and expiry timestamps, signed by Wildcat's org key. The upgrade path is
-    a TEE-held key (AWS Nitro Enclaves has the mature attestation story in
+    a TEE-held key (AWS Nitro Enclaves carries the mature attestation tooling in
     2026; SGX is deprecated on client silicon) with the pinned metric code
     published: trust Wildcat today, trust the enclave and the code tomorrow.
     That is Credora's architecture with current parts.
-    <span class="badge official">official</span> on the TEE landscape.</li>
+    <span class="badge official">official</span> on the TEE facts.</li>
     <li><strong>PDF tear-sheet</strong> rendering the same bundle, with the
     JSON hash printed on it, for credit committees.</li>
     <li><strong>EAS attestations onchain.</strong> The Ethereum Attestation
-    Service is production-proven at scale (Coinbase Verifications on Base).
+    Service is production-proven (Coinbase Verifications on Base, 77k-plus
+    verified users).
     Publish covenant-status tiers or booleans under a Wildcat schema,
     revocable and expiring, and let V2 hooks consume them: Wildcat's docs
     already contemplate access policies keyed on "a credential testifying to
@@ -326,7 +327,7 @@
     <p>Design synthesis and its sourced inputs live in
     <a href="research/research-F-architecture.md">research stream F</a>:
     Credora and RedStone coverage, 3Jane verification, zkTLS and TEE
-    landscape citations, EAS production evidence, clean-room documentation,
+    citations, EAS production evidence, clean-room documentation,
     vendor documentation for Heron, Ntropy and Ocrolus, and Wildcat's own
     docs for the hooks system.</p>
   </div>
