@@ -26,7 +26,8 @@ def main() -> int:
         for target in ATTR.findall(page.read_text(encoding="utf-8")):
             if target.startswith(("http://", "https://", "mailto:", "data:")):
                 continue
-            path, _, frag = target.partition("#")
+            resource, _, frag = target.partition("#")
+            path, _, _query = resource.partition("?")
             if path:
                 resolved = (ROOT / path).resolve()
                 if not resolved.exists():
