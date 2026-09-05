@@ -1,0 +1,38 @@
+[
+  {
+    "url": "https://defillama.com/api/public/market-makers/performance?start_date=2026-08-06&end_date=2026-09-05&_n=1788621040117",
+    "status": 200,
+    "file": "/Users/c0rtexzer0/Documents/GitHub/plaidcat/research/defillama-probe/raw/mm-api-ublic_market_makers_performance_start_date_2026_08_06_end_date_2026_09_05__n_1788621040117",
+    "bytes": 17320
+  },
+  {
+    "url": "https://defillama.com/api/public/market-makers/aggregated?start_date=2026-08-06&end_date=2026-09-05&_n=1788621040117",
+    "status": 200,
+    "file": "/Users/c0rtexzer0/Documents/GitHub/plaidcat/research/defillama-probe/raw/mm-api-public_market_makers_aggregated_start_date_2026_08_06_end_date_2026_09_05__n_1788621040117",
+    "bytes": 38681
+  },
+  {
+    "url": "https://defillama.com/api/public/market-makers/depth?start_date=2026-08-06&end_date=2026-09-05&_n=1788621058639",
+    "status": 200,
+    "file": "/Users/c0rtexzer0/Documents/GitHub/plaidcat/research/defillama-probe/raw/mm-api-_api_public_market_makers_depth_start_date_2026_08_06_end_date_2026_09_05__n_1788621058639",
+    "bytes": 120133
+  },
+  {
+    "url": "https://defillama.com/api/public/market-makers/kpi?start_date=2026-08-06&end_date=2026-09-05&_n=1788621067154",
+    "status": 200,
+    "file": "/Users/c0rtexzer0/Documents/GitHub/plaidcat/research/defillama-probe/raw/mm-api-om_api_public_market_makers_kpi_start_date_2026_08_06_end_date_2026_09_05__n_1788621067154",
+    "bytes": 26095
+  },
+  {
+    "url": "https://defillama.com/api/public/market-makers/spread?start_date=2026-08-06&end_date=2026-09-05&_n=1788621075712",
+    "status": 200,
+    "file": "/Users/c0rtexzer0/Documents/GitHub/plaidcat/research/defillama-probe/raw/mm-api-api_public_market_makers_spread_start_date_2026_08_06_end_date_2026_09_05__n_1788621075712",
+    "bytes": 16257
+  },
+  {
+    "url": "https://defillama.com/api/public/market-makers/volume?start_date=2026-08-06&end_date=2026-09-05&_n=1788621084237",
+    "status": 200,
+    "file": "/Users/c0rtexzer0/Documents/GitHub/plaidcat/research/defillama-probe/raw/mm-api-api_public_market_makers_volume_start_date_2026_08_06_end_date_2026_09_05__n_1788621084237",
+    "bytes": 37442
+  }
+]

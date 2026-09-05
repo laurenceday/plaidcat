@@ -169,10 +169,19 @@ Same enum: `active`, `success`, `failed`
 - `failed`: Check failed
 - `not_applicable`: Check not applicable to this business
 
-### Match Summary (`summary` field)
-- `"yes"`: Field matched
-- `"no"`: Field didn't match
-- `no_data`: Could not determine value
+### Match Summary (`summary` field - `MatchSummaryCode`)
+- `"match"`: Strong match against external data source
+- `"partial_match"`: Approximate match (e.g., "Knope" vs "Knope-Wyatt")
+- `"no_match"`: Data checked but didn't match
+- `"no_data"`: External data not found for comparison
+- `"no_input"`: Field not provided by user
+
+### Business Entity Types (`BusinessEntityType`)
+`sole_proprietorship`, `general_partnership`, `llc`, `llp`, `lllp`, `lp`, `c_corporation`, `s_corporation`, `b_corporation`, `nonprofit`, `cooperative`, `trust`, `professional_association`, `professional_corporation`, `trade_name`, `bank`, `credit_union`, `insurance`, `other`, `unknown`
+
+### Website Analysis Statuses
+- **is_parked / email_is_deliverable / ssl.is_valid**: `"yes"`, `"no"`, `"no_data"` (`BusinessCheckBooleanStatus`)
+- **website_build_status**: `"active"`, `"inactive"`, `"coming_soon"` (`BusinessWebsiteBuildStatus`)
 
 ---
 
@@ -340,12 +349,83 @@ Based on response schema:
 
 ## Open Questions
 
-1. What triggers `status: failed` vs `success`?
-2. Are there webhook notifications for completion?
-3. What are the rate limits?
-4. Is there a bulk/batch endpoint?
-5. How does pricing work (per verification, monthly minimums)?
-6. Which industries/geographies have best coverage?
+1. **What triggers `status: failed` vs `success`?**  
+   - Inferred: Major data mismatches (name, address, entity type) or inability to locate business in any external database
+   - Partial matches (`partial_match`) still return `success` with lower confidence scores
+   - `failed` likely means no viable match found across all data sources
+
+2. **Are there webhook notifications for completion?**  
+   - **Answer: Likely polling required**  
+   - No `BUSINESS_VERIFICATION_*` events in `/sandbox/item/fire_webhook` documentation
+   - Standard Plaid webhooks (`DEFAULT_UPDATE`, `SYNC_UPDATES_AVAILABLE`) don't mention business verification
+   - Recommendation: Poll every 30-60 seconds until status != `active`
+
+3. **What are the rate limits?**  
+   - Not exposed in TypeScript types or OpenAPI comments
+   - Likely server-side configuration (429 response with `RATE_LIMIT_EXCEEDED` error code exists)
+   - Standard Plaid API limits probably apply (~100-500 req/min depending on tier)
+
+4. **Is there a bulk/batch endpoint?**  
+   - **Answer: Not in current SDK/API surface**  
+   - No `business_verification/batch`, `/bulk`, or `/list` endpoints in Node SDK types
+   - No `BusinessVerificationListRequest/Response` interfaces found
+   - Workaround: Parallelize individual `/create` calls with rate limiting
+
+5. **How does pricing work (per verification, monthly minimums)?**  
+   - Not public; likely per-verification model similar to IDV (~$1-3/check)
+   - Contact Plaid sales for enterprise pricing
+
+6. **Which industries/geographies have best coverage?**  
+   - NAICS codes returned suggest strong US coverage
+   - Entity types include international forms (LLP, LLLP) but likely US-focused
+   - Country field accepts ISO 3166-1 alpha-2; test non-US businesses for data quality
+
+---
+
+## Implementation Notes from TypeScript SDK
+
+### Request Validation Rules
+```typescript
+// BusinessVerificationCreateRequestBusiness
+name?: string;              // 1-500 chars
+alternative_name?: string;  // optional
+website?: string;           // must start with http:// or https://
+phone_number?: string;      // E.164 format (+1234567890)
+email_address?: string;     // RFC 3696 compliant
+
+// RequestBusinessAddress
+street: string;             // required, 1-80 chars, alpha
+street2?: string;           // optional, max 50 chars
+city: string;               // required, 1-100 chars, alpha
+region?: string;            // optional (state/province code)
+postal_code?: string;       // optional, 2-10 alphanumeric (US=5 digits)
+country: string;            // required, ISO 3166-1 alpha-2 uppercase
+```
+
+### Response Structure
+All checks return consistent pattern:
+```typescript
+{
+  status: "active" | "success" | "failed",
+  score: number,              // 0-100 confidence score
+  summary?: "match" | "partial_match" | "no_match" | "no_data" | "no_input",
+  match_details?: {           // Only on success
+    names: ProviderBusinessName[],
+    entity_type: BusinessEntityType,
+    addresses: ResponseBusinessAddress[],
+    formation_date?: string   // ISO date format
+  }
+}
+```
+
+### Error Handling
+```typescript
+// PlaidErrorType includes:
+RATE_LIMIT_EXCEEDED         // HTTP 429
+INSTITUTION_ERROR           // Data provider unavailable
+INVALID_INPUT               // Request validation failed
+ITEM_ERROR                  // Business not found / general failure
+```
 
 ---
 
