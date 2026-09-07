@@ -1,0 +1,8 @@
+# macOS
+.DS_Store
+
+# Archives — the extracted content is tracked in-tree; do not commit the zip too
+*.zip
+
+# Node (probe/defillama)
+node_modules/
