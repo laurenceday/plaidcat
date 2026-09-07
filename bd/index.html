@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Plaidcat: can Wildcat own the borrower data layer?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css?v=20260826-2">
+<link rel="icon" href="assets/wildcat-logo-black.svg" type="image/svg+xml">
+</head>
+<body>
+
+<nav class="top">
+  <div class="bar">
+    <a class="logo" href="index.html"><img src="assets/wildcat-logo-white.svg" alt="Wildcat"><span>plaidcat</span></a>
+    <a class="item active" href="index.html">Overview</a>
+    <a class="item" href="technical.html">Technical</a>
+    <a class="item" href="products.html">Products</a>
+    <a class="item" href="coverage.html">Coverage</a>
+    <a class="item" href="legal.html">Legal</a>
+    <a class="item" href="commercial.html">Commercial</a>
+    <a class="item" href="architecture.html">Architecture</a>
+    <a class="item" href="moat.html">Moat</a>
+    <a class="item" href="bd-primer.html">Primers</a>
+    <span class="spacer"></span>
+    <span class="tag">Fiat run · 2026-08-26</span>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="inner">
+    <div class="copy">
+      <span class="kicker">Wildcat Labs research</span>
+      <h1>Can Wildcat own the borrower data layer?</h1>
+      <p class="lede">
+        Whether Wildcat can pull permissioned corporate bank data through
+        Plaid, keep and normalize it, expose slices of it to third-party
+        analysts, and hand lenders only derived metrics. And whether holding
+        that data builds a moat. Researched deep, answered plainly, with the
+        evidence attached.
+      </p>
+      <p class="meta">
+        A Shoggoth Fiat run · six research streams plus a verification pass ·
+        current as of 26 August 2026. Plaid-official claims were verified
+        against a local mirror of plaid.com/docs (mid-2026 vintage, entries
+        through July 2026) after an initial pass built on the OpenAPI
+        specification and search extracts; corrections from that
+        verification are applied throughout. Verify contract clauses against
+        live pages before relying on them.
+      </p>
+    </div>
+    <div class="art"><img src="assets/generated/hero-data-steward.webp"
+      width="1127" height="1396" fetchpriority="high"
+      style="display:block;width:100%;max-width:360px;height:auto;aspect-ratio:1127 / 1396;object-fit:contain;margin:0 auto"
+      alt="Wildcat mascot maintaining a borrower data feed at an analyst's desk"></div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <h2 id="verdicts">The two answers</h2>
+
+  <div class="callout verdict">
+    <span class="label">Core question 1 · How hard is it?</span>
+    <p><strong>Technically: modest. Commercially: cheap but conditional.
+    Legally: contract-bound, not law-bound.</strong>
+    The pipe is real. Plaid connects business accounts at SMB and fintech
+    banks, tokens never expire by design, and a two-year transaction backfill
+    plus webhook-driven monitoring is a supported, documented pattern that
+    costs a rounding error ($6k-$12k a year at 100 borrowers). The hard
+    parts sit at the edges: treasury portals at large banks are invisible to
+    every aggregator, only the primary account holder can link at some banks,
+    consent decays on 12-month timers at others, and the whole model needs
+    Plaid's written use-case approval plus carefully drafted borrower consent
+    to survive its contract terms. Third-party analytics access is
+    structurable today; publishing raw data never is.</p>
+  </div>
+
+  <div class="callout verdict">
+    <span class="label">Core question 2 · Is the data a moat?</span>
+    <p><strong>The raw data is not a moat. The outcomes dataset is.</strong>
+    Any competitor with the borrower's consent re-pulls the same 24 months of
+    history in roughly one API call, and borrowers hold contractual deletion
+    rights over raw data. What compounds instead: history past month 24 that
+    no re-link can reproduce, the standing consent graph with contractual
+    teeth, and above all the joining of cash-flow features to onchain credit
+    outcomes. Nobody else can assemble that label set. Build the layer as a
+    label factory from day one and the moat builds itself.</p>
+  </div>
+
+  <h2 id="pipeline">The desired architecture, annotated</h2>
+
+  <figure class="diagram">
+    <svg viewBox="0 0 920 400" role="img" aria-label="Pipeline from borrower consent through Plaid to lenders, annotated with difficulty">
+      <defs>
+        <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" fill="#30313E"/>
+        </marker>
+      </defs>
+      <!-- faint orbital lines -->
+      <ellipse cx="460" cy="200" rx="430" ry="150" fill="none" stroke="#3E68FF" stroke-opacity="0.10" stroke-width="1.5"/>
+      <ellipse cx="460" cy="200" rx="360" ry="115" fill="none" stroke="#4D26BC" stroke-opacity="0.10" stroke-width="1.5"/>
+      <!-- row 1 -->
+      <g font-family="'Liberation Sans', Arial, sans-serif" font-size="14" fill="#141414">
+        <rect x="20" y="60" width="150" height="52" rx="10" fill="#FCFCFC" stroke="#141414" stroke-width="1.5"/>
+        <text x="95" y="82" text-anchor="middle" font-weight="bold">Corporate borrower</text>
+        <text x="95" y="100" text-anchor="middle" font-size="11" fill="#8A8C9F">clicks Connect</text>
+
+        <rect x="220" y="60" width="150" height="52" rx="10" fill="#FCFCFC" stroke="#141414" stroke-width="1.5"/>
+        <text x="295" y="82" text-anchor="middle" font-weight="bold">Consent</text>
+        <text x="295" y="100" text-anchor="middle" font-size="11" fill="#8A8C9F">Link + bank OAuth</text>
+
+        <rect x="420" y="60" width="150" height="52" rx="10" fill="#FCFCFC" stroke="#141414" stroke-width="1.5"/>
+        <text x="495" y="82" text-anchor="middle" font-weight="bold">Plaid</text>
+        <text x="495" y="100" text-anchor="middle" font-size="11" fill="#8A8C9F">Items, tokens, webhooks</text>
+
+        <rect x="620" y="60" width="170" height="52" rx="10" fill="#1B1530" stroke="#4D26BC" stroke-width="1.5"/>
+        <text x="705" y="82" text-anchor="middle" font-weight="bold" fill="#FFFFFF">Wildcat data layer</text>
+        <text x="705" y="100" text-anchor="middle" font-size="11" fill="#BEBECE">raw · normalized · derived</text>
+
+        <!-- row 2 -->
+        <rect x="620" y="230" width="170" height="52" rx="10" fill="#FCFCFC" stroke="#141414" stroke-width="1.5"/>
+        <text x="705" y="252" text-anchor="middle" font-weight="bold">Permissioned analytics</text>
+        <text x="705" y="270" text-anchor="middle" font-size="11" fill="#8A8C9F">scoped, audited access</text>
+
+        <rect x="420" y="230" width="150" height="52" rx="10" fill="#FCFCFC" stroke="#141414" stroke-width="1.5"/>
+        <text x="495" y="252" text-anchor="middle" font-weight="bold">Derived metrics</text>
+        <text x="495" y="270" text-anchor="middle" font-size="11" fill="#8A8C9F">signed, dated, expiring</text>
+
+        <rect x="220" y="230" width="150" height="52" rx="10" fill="#FCFCFC" stroke="#141414" stroke-width="1.5"/>
+        <text x="295" y="252" text-anchor="middle" font-weight="bold">Lenders</text>
+        <text x="295" y="270" text-anchor="middle" font-size="11" fill="#8A8C9F">tear-sheets, attestations</text>
+
+        <!-- arrows -->
+        <line x1="170" y1="86" x2="212" y2="86" stroke="#30313E" stroke-width="1.5" marker-end="url(#arr)"/>
+        <line x1="370" y1="86" x2="412" y2="86" stroke="#30313E" stroke-width="1.5" marker-end="url(#arr)"/>
+        <line x1="570" y1="86" x2="612" y2="86" stroke="#30313E" stroke-width="1.5" marker-end="url(#arr)"/>
+        <line x1="705" y1="112" x2="705" y2="222" stroke="#30313E" stroke-width="1.5" marker-end="url(#arr)"/>
+        <line x1="612" y1="256" x2="578" y2="256" stroke="#30313E" stroke-width="1.5" marker-end="url(#arr)"/>
+        <line x1="412" y1="256" x2="378" y2="256" stroke="#30313E" stroke-width="1.5" marker-end="url(#arr)"/>
+
+        <!-- annotations -->
+        <text x="295" y="140" text-anchor="middle" font-size="11" fill="#C24647">only the primary owner can link at some banks</text>
+        <text x="470" y="42" text-anchor="middle" font-size="11" fill="#C24647">treasury portals invisible; consent timers</text>
+        <text x="705" y="24" text-anchor="middle" font-size="11" fill="#8A6B10">needs Plaid-approved use case in writing</text>
+        <text x="705" y="310" text-anchor="middle" font-size="11" fill="#8A6B10">papered service providers + express consent</text>
+        <text x="495" y="330" text-anchor="middle" font-size="11" fill="#157A47">entity-level and non-reidentifiable: durable</text>
+        <text x="295" y="310" text-anchor="middle" font-size="11" fill="#157A47">consumable by V2 hooks</text>
+      </g>
+    </svg>
+    <figcaption>
+      The brief's desired flow, with the run's findings written on it. Green
+      is settled ground, amber is contract work, red is structural friction.
+      Raw transaction data never crosses to analysts unbound or to lenders at
+      all.
+    </figcaption>
+  </figure>
+
+  <h2 id="brief">The brief, restated</h2>
+  <p>
+    Wildcat is onchain credit infrastructure. The economically important facts
+    about a corporate borrower live off-chain: balances, inflows and outflows,
+    customer concentration, recurring obligations, liquidity, working-capital
+    behavior, statements, payment performance. The premise under test is that
+    Wildcat should hold and control access to a permissioned dataset of those
+    facts, let third parties such as DeFi Llama, accountants, or auditors
+    compute agreed metrics against defined subsets, and distribute only the
+    agreed derived results to lenders. Raw transaction-level information stays
+    confidential.
+  </p>
+  <blockquote>
+    "Wildcat has obtained this information with the borrower's permission.
+    DeFi Llama is granted permissioned access to a defined subset of that
+    information for the purpose of calculating agreed financial metrics. Only
+    agreed derived results may be distributed to lenders."
+  </blockquote>
+  <p>
+    The full input brief is committed to this repository alongside the six
+    research streams that answer it; every page below cites its stream.
+  </p>
+
+  <h2 id="map">Reading map</h2>
+
+  <div class="grid cols-2">
+    <a class="plain" href="technical.html"><div class="card link-card">
+      <h3>Part I · The pipe</h3>
+      <p class="small">The complete connect-to-data workflow: Link, OAuth,
+      Items, tokens that never expire, webhooks, revocation from three sides,
+      re-authentication. Actor by actor, endpoint by endpoint.</p>
+    </div></a>
+    <a class="plain" href="products.html"><div class="card link-card">
+      <h3>Part II · The data</h3>
+      <p class="small">Transactions against Assets against Statements against
+      everything else. What two years of history really means, what refreshes
+      when, and which product carries a persistent cash-flow dataset.</p>
+    </div></a>
+    <a class="plain" href="coverage.html"><div class="card link-card">
+      <h3>Part III · Business accounts</h3>
+      <p class="small">Where corporate money actually sits and whether Plaid
+      can see it. SMB banking connects; treasury portals do not. Coverage by
+      borrower archetype, the ways connections fail, and mitigations.</p>
+    </div></a>
+    <a class="plain" href="legal.html"><div class="card link-card">
+      <h3>Data rights &amp; law</h3>
+      <p class="small">Who owns what under Plaid's MSA, what consent must say,
+      1033's fate, GLBA and FCRA boundaries, GDPR traps, and the ranked list
+      of real constraints against paper tigers.</p>
+    </div></a>
+    <a class="plain" href="commercial.html"><div class="card link-card">
+      <h3>Commercials</h3>
+      <p class="small">Pricing mechanics, the cost model at 20, 100 and 500
+      borrowers, production approval, the crypto question, and the three
+      commercial risks that matter.</p>
+    </div></a>
+    <a class="plain" href="architecture.html"><div class="card link-card">
+      <h3>Part IV · The Wildcat data layer</h3>
+      <p class="small">Five layers from immutable raw capture to lender
+      distribution. Metric formulas with their edge cases, analytics access
+      postures, anti-gaming, build costs, and a prototype runbook.</p>
+    </div></a>
+    <a class="plain" href="moat.html"><div class="card link-card">
+      <h3>The moat verdict</h3>
+      <p class="small">What every dead credit protocol teaches, what Credora's
+      acquisition proves, and why the defensible asset is outcomes joined to
+      cash flows rather than the data itself.</p>
+    </div></a>
+    <div class="card">
+      <h3>Primers</h3>
+      <p class="small">
+        The same findings shaped per audience:<br>
+        <a href="bd-primer.html">Business development</a> ·
+        <a href="engineering-primer.html">Engineering</a> ·
+        <a href="legal-primer.html">Legal &amp; compliance</a>
+      </p>
+    </div>
+    <div class="card">
+      <h3>Later briefs <span class="small">· 2026-09-05</span></h3>
+      <p class="small">
+        Written after this run and not covered by its audit passes:<br>
+        <a href="briefs/borrower-data-research-brief.md">Borrower-data brief</a>
+        &mdash; the evidence model, and why a bounded finding is not a
+        solvency claim.<br>
+        <a href="briefs/plaid-business-verification.md">Business Verification API</a>
+        &mdash; Plaid's undocumented KYB endpoints and schemas.
+      </p>
+    </div>
+  </div>
+
+  <h2 id="numbers">The run in numbers</h2>
+  <div class="grid cols-3">
+    <div class="card"><span class="num">730</span>days of transaction history per Item, requested once at Link, immutable afterward</div>
+    <div class="card"><span class="num">1-4×</span>per day, Plaid's automatic refresh cadence per institution; there is no real-time feed</div>
+    <div class="card"><span class="num">~$9k</span>median annual Plaid contract across 39 verified purchases; Wildcat's bracket at 100 borrowers</div>
+    <div class="card"><span class="num">10-40%</span>of a mid-market corporate's accounts reachable by any aggregator; the treasury-portal wall</div>
+    <div class="card"><span class="num">11</span>US institutions on Plaid's OAuth consent-refresh list, mostly 12-month timers (Brex: 3 months); re-auth is contractual maintenance</div>
+    <div class="card"><span class="num">$56M</span>frozen in Goldfinch's wind-down; the going rate for trusting self-reported financials</div>
+  </div>
+
+  <div class="callout note">
+    <span class="label">Method &amp; trust</span>
+    <p>Claims across this site carry confidence labels:
+    <span class="badge official">official</span> Plaid docs, bank pages,
+    regulators, court filings; <span class="badge reported">operator-reported</span>
+    forums, customer help centers, procurement intelligence;
+    <span class="badge inferred">inferred</span> triangulated from absence or
+    adjacent evidence; <span class="badge unverified">unverified</span> best
+    understanding, check before relying. The raw research streams under
+    <code>research/</code> carry per-claim source URLs. Nothing here is legal
+    advice.</p>
+  </div>
+
+</main>
+
+<footer class="site">
+  <div class="inner">
+    <img src="assets/wildcat-logo-white.svg" alt="Wildcat">
+    <span>Wildcat Labs · Shoggoth Fiat run · plaidcat</span>
+    <span class="spacer"></span>
+    <span>Let there be light.</span>
+  </div>
+</footer>
+
+</body>
+</html>

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Link check for the plaidcat site.
 
-Scans every .html file at the repository root, extracts href/src values,
+Scans every .html file in the bd/ site folder, extracts href/src values,
 and verifies that repository-local targets exist. External URLs (http, https,
 mailto) are skipped; fragments are checked against id attributes in the
 target page. Usage: linkcheck.py [report-file]. Writes one
@@ -12,14 +12,14 @@ import re
 import sys
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
+SITE = Path(__file__).resolve().parent.parent / "bd"
 ATTR = re.compile(r"""(?:href|src)\s*=\s*["']([^"']+)["']""", re.I)
 IDS = re.compile(r"""id\s*=\s*["']([^"']+)["']""", re.I)
 
 
 def main() -> int:
     report = open(sys.argv[1], "w") if len(sys.argv) > 1 else sys.stdout
-    pages = sorted(ROOT.glob("*.html"))
+    pages = sorted(SITE.glob("*.html"))
     ids = {p.name: set(IDS.findall(p.read_text(encoding="utf-8"))) for p in pages}
     defects = []
     for page in pages:
@@ -29,7 +29,7 @@ def main() -> int:
             resource, _, frag = target.partition("#")
             path, _, _query = resource.partition("?")
             if path:
-                resolved = (ROOT / path).resolve()
+                resolved = (SITE / path).resolve()
                 if not resolved.exists():
                     defects.append(f"{page.name} -> {target}")
                     continue
