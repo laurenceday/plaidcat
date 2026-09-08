@@ -1,0 +1,17 @@
+[
+  {
+    "url": "https://defillama.com/market-makers",
+    "status": 200,
+    "file": "/Users/c0rtexzer0/Documents/GitHub/plaidcat/research/defillama-probe/raw/mm-capture-https___defillama_com_market_makers"
+  },
+  {
+    "url": "https://defillama.com/api/public/market-makers/aggregated?start_date=2026-08-06&end_date=2026-09-05&_n=1788620899198",
+    "status": 200,
+    "file": "/Users/c0rtexzer0/Documents/GitHub/plaidcat/research/defillama-probe/raw/mm-capture-ket_makers_aggregated_start_date_2026_08_06_end_date_2026_09_05__n_1788620899198"
+  },
+  {
+    "url": "https://defillama.com/api/public/market-makers/performance?start_date=2026-08-06&end_date=2026-09-05&_n=1788620899198",
+    "status": 200,
+    "file": "/Users/c0rtexzer0/Documents/GitHub/plaidcat/research/defillama-probe/raw/mm-capture-et_makers_performance_start_date_2026_08_06_end_date_2026_09_05__n_1788620899198"
+  }
+]
