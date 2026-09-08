@@ -89,6 +89,101 @@
     label factory from day one and the moat builds itself.</p>
   </div>
 
+  <h2 id="followups">Two follow-up questions, answered</h2>
+  <p>
+    Two questions came up after the August run and were worked separately on
+    5 September 2026. First: can borrower-consented Plaid data actually carry
+    a solvency claim? Second: the brief names DeFi Llama as the outside
+    analyst &mdash; does that arrangement exist? Neither answer overturns the
+    two verdicts above; both tighten what the product is allowed to say. This
+    later material sits outside the run's audit passes.
+  </p>
+
+  <div class="grid cols-2">
+    <div class="card">
+      <h3>1 &middot; The Plaid data question</h3>
+      <p class="small"><em>Can consented bank data tell a lender that a borrower is solvent?</em></p>
+      <p><strong>No &mdash; but it can tell them specific, dated, expiring
+      things, and that is still worth having.</strong></p>
+      <p class="small">
+        Plaid shows what it can see, and what it cannot see reads as absent
+        rather than hidden: no liabilities feed on an account does not mean no
+        debt on it. Coverage, history depth and pending-versus-posted treatment
+        vary by institution. Geography is uneven. The pipe is strongest in the
+        US and Canada; the European picture in the supplied material
+        (Transactions and Assets available, income UK-only, liabilities
+        unavailable) is a hypothesis to confirm institution by institution, not
+        a coverage guarantee. <span class="badge unverified">unverified</span>
+      </p>
+      <p class="small">
+        So the thing Wildcat publishes is a <strong>bounded finding</strong>,
+        never a rating. Each one carries its entity and facility perimeter, the
+        evidence module and methodology version, as-of time, expiry, what was
+        left out, and whether it may be shown publicly or only to lenders. A
+        positive finding never erases missing debt, stale data or revoked
+        consent.
+      </p>
+      <p class="small">
+        The same pass found <strong>26 POST methods</strong> hidden from the
+        docs in Plaid's pinned public OpenAPI snapshot, among them Business
+        Verification, Plaid's KYB product.
+        <span class="badge official">official</span> Those are written
+        questions for Plaid, not a shopping list. Appearing in a public
+        specification establishes no access, permitted use or commercial terms.
+      </p>
+      <p class="small">
+        <a href="briefs/borrower-data-research-brief.md">Borrower-data brief</a> &middot;
+        <a href="briefs/plaid-business-verification.md">Business Verification deep dive</a>
+      </p>
+    </div>
+
+    <div class="card">
+      <h3>2 &middot; The DeFi Llama question</h3>
+      <p class="small"><em>Would the third-party analyst arrangement in the brief actually work?</em></p>
+      <p><strong>Half of it already runs. DeFi Llama publishes derived results
+      the way this brief wants; nothing on their side takes consent or raw
+      data in.</strong></p>
+      <p class="small">
+        The live surface was probed on 5 September 2026. A read-side
+        verification API on a DeFi Llama preview host answers plain HTTP with
+        no authentication:
+        <code>GET /api/public/verified/frxusd</code> returns precisely the
+        shape the brief asks for &mdash; a reserve total, an asset breakdown
+        and a freshness flag, with no underlying records. The snapshot read
+        $111,957,619 of reserves against a 113,129,506 frxUSD supply. One
+        project is live on it; every other identifier tried returned
+        not-found. That is the read side of this entire design, already
+        running in public.
+      </p>
+      <p class="small">
+        The other half is missing. There is <strong>no public route to
+        connect, consent or submit</strong> anything. Borrower consent, raw
+        capture and scoped analyst access &mdash; the parts that make the
+        arrangement work &mdash; are not surfaces DeFi Llama exposes. Wildcat
+        builds or contracts them.
+      </p>
+      <p class="small">
+        Their market-maker dashboard (seven
+        <code>/api/public/market-makers/*</code> routes) sits behind a browser
+        challenge and is not a commercial API contract. Treat it as
+        market-performance context carrying no redistribution right, never as
+        a borrower's balance sheet. Capture scripts and raw responses live in
+        <code>probe/defillama/</code>.
+      </p>
+    </div>
+  </div>
+
+  <div class="callout good">
+    <span class="label">What the two follow-ups change</span>
+    <p>Nothing in the verdicts above. The pipe is still modest to build, and
+    the outcomes dataset is still the asset that compounds. What changes is
+    discipline on the output side: publish narrow findings with their limits
+    attached rather than broad ratings, and get written answers from Plaid and
+    from any interim assessor &mdash; on entitlement, permitted use,
+    retention, revocation and export &mdash; before running a pilot cohort
+    rather than after.</p>
+  </div>
+
   <h2 id="pipeline">The desired architecture, annotated</h2>
 
   <figure class="diagram">

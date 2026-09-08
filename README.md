@@ -13,7 +13,7 @@ or serve `bd/` with any static file server. Every page prints cleanly to PDF.
 
 | Page | What it answers |
 | --- | --- |
-| `index.html` | Both core verdicts, the pipeline at a glance, reading map |
+| `index.html` | Both core verdicts, the two later follow-ups synthesised, the pipeline at a glance, reading map |
 | `technical.html` | Part I, the complete connect-to-data workflow, tokens, webhooks, lifecycle |
 | `products.html` | Part II, Transactions vs Assets vs Statements vs the rest |
 | `coverage.html` | Part III, business/commercial account reality |
